@@ -62,4 +62,7 @@ jobs:
               echo "{\"error\": \"El montaje falló\", \"run\": \"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}" > out/info.json
               gh release create "$nombre" out/info.json --title "$nombre (error)" --notes "Montaje fallido" --target "$GITHUB_SHA" --latest=false
             fi
+            # Aviso a n8n (VIRALFORGE · motor de producción) de que el montaje terminó
+            cb=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('callback_url') or '')" "$job")
+            if [ -n "$cb" ]; then curl -s -m 20 -X POST -H 'Content-Type: application/json' -d "{\"release\": \"$nombre\"}" "$cb" || true; fi
           done < encargos.txt

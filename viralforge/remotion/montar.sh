@@ -10,7 +10,7 @@ node preparar.mjs "$JOB"
 COMPO=$(cat public/job/composicion.txt)
 NAV=${REMOTION_BROWSER:+--browser-executable="$REMOTION_BROWSER"}
 npx remotion render src/index.ts "$COMPO" "$RAIZ/out/video.mp4" --props=public/job/props.json \
-  --codec=h264 --crf=18 --concurrency=100% $NAV
+  --codec=h264 --crf=20 --concurrency=100% $NAV
 if [ "$COMPO" = "Historia" ]; then
   # Portada: primera escena con el título grande
   python3 -c "import json;p=json.load(open('public/job/props.json'));p['portada']=True;json.dump(p,open('public/job/portada.json','w'))"
