@@ -1,0 +1,24 @@
+{
+  "name": "viralforge-remotion",
+  "private": true,
+  "version": "1.0.0",
+  "description": "VIRALFORGE AI · motor de animación de Shorts con Remotion",
+  "scripts": {
+    "preparar": "node preparar.mjs",
+    "render": "remotion render src/index.ts Short out/video.mp4 --props=public/job/props.json --codec=h264 --crf=18 --concurrency=100%",
+    "studio": "remotion studio src/index.ts"
+  },
+  "dependencies": {
+    "@fontsource/fredoka": "^5.3.0",
+    "@remotion/cli": "4.0.547",
+    "@remotion/media-utils": "4.0.547",
+    "@remotion/transitions": "4.0.547",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.547"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.0",
+    "typescript": "5.6.3"
+  }
+}

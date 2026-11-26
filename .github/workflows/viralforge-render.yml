@@ -17,7 +17,7 @@ concurrency:
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,6 +27,18 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: viralforge/remotion/package-lock.json
+
+      - name: Preparar Remotion
+        working-directory: viralforge/remotion
+        run: |
+          npm ci --no-audit --no-fund
+          npx remotion browser ensure
 
       - name: Montar los encargos nuevos
         env:
@@ -39,8 +51,11 @@ jobs:
             [ -z "$job" ] && continue
             nombre=$(basename "$job" .json)
             rm -rf out work
-            if python3 viralforge/render/render.py "$job"; then
-              gh release create "$nombre" out/video.mp4 out/portada.jpg out/hoja.jpg out/info.json out/voz.mp3 $(ls out/escena_*.img 2>/dev/null) \
+            # Motor por defecto: Remotion. "motor": "ffmpeg" en el encargo usa el montaje simple.
+            motor=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('motor','remotion'))" "$job")
+            if [ "$motor" = "ffmpeg" ]; then montar="python3 viralforge/render/render.py"; else montar="viralforge/remotion/montar.sh"; fi
+            if $montar "$job"; then
+              gh release create "$nombre" out/video.mp4 out/portada.jpg out/hoja.jpg out/info.json out/voz.mp3 $(ls out/escena_* 2>/dev/null) \
                 --title "$nombre" --notes "Vídeo VIRALFORGE montado automáticamente" --target "$GITHUB_SHA" --latest=false
             else
               mkdir -p out
