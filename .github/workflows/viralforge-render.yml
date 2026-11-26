@@ -1,44 +1,50 @@
 name: VIRALFORGE · Montar Short
-run-name: VIRALFORGE render ${{ inputs.id }}
 
+# n8n sube un encargo a viralforge/jobs/<nombre>.json y este flujo monta el vídeo.
+# El resultado se publica como release "<nombre>" con video.mp4, portada.jpg, hoja.jpg e info.json.
 on:
-  workflow_dispatch:
-    inputs:
-      id:
-        description: "Código del vídeo (p. ej. VF-0001)"
-        required: true
-      job_url:
-        description: "URL pública del encargo job.json"
-        required: true
+  push:
+    branches: [main]
+    paths:
+      - "viralforge/jobs/*.json"
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: viralforge-render-${{ github.sha }}
 
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: viralforge/render
+          fetch-depth: 2
 
       - name: Instalar ffmpeg y fuentes
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
 
-      - name: Descargar encargo
+      - name: Montar los encargos nuevos
         env:
-          JOB_URL: ${{ inputs.job_url }}
-        run: curl -fsSL "$JOB_URL" -o job.json
-
-      - name: Montar vídeo
-        run: python3 viralforge/render/render.py job.json
-
-      - name: Guardar resultado
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.id }}
-          path: out/
-          retention-days: 7
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -u
+          git diff --name-only --diff-filter=AM HEAD~1 HEAD -- 'viralforge/jobs/*.json' > encargos.txt || true
+          cat encargos.txt
+          while read -r job; do
+            [ -z "$job" ] && continue
+            nombre=$(basename "$job" .json)
+            rm -rf out work
+            if python3 viralforge/render/render.py "$job"; then
+              gh release create "$nombre" out/video.mp4 out/portada.jpg out/hoja.jpg out/info.json \
+                --title "$nombre" --notes "Vídeo VIRALFORGE montado automáticamente" --target "$GITHUB_SHA" --latest=false
+            else
+              mkdir -p out
+              echo "{\"error\": \"El montaje falló\", \"run\": \"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}" > out/info.json
+              gh release create "$nombre" out/info.json --title "$nombre (error)" --notes "Montaje fallido" --target "$GITHUB_SHA" --latest=false
+            fi
+          done < encargos.txt
