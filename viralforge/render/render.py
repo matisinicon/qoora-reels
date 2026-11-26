@@ -169,6 +169,11 @@ def main():
         "-t", f"{total:.2f}", "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
         "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", f"{OUT}/video.mp4"])
     sh(["ffmpeg", "-y", "-v", "error", "-ss", "1", "-i", f"{OUT}/video.mp4", "-frames:v", "1", "-q:v", "3", f"{OUT}/portada.jpg"])
+    # Hoja de contactos: 8 fotogramas repartidos (para la revisión visual de GUARDIAN)
+    paso = max(total / 8, 0.5)
+    sh(["ffmpeg", "-y", "-v", "error", "-i", f"{OUT}/video.mp4", "-vf",
+        f"fps=1/{paso:.3f},scale=270:480,tile=4x2:padding=6:margin=6:color=black", "-frames:v", "1", "-q:v", "4",
+        f"{OUT}/hoja.jpg"])
 
     info = {"id": job.get("id"), "duracion": round(duracion(f"{OUT}/video.mp4"), 2), "escenas": len(partes),
             "resolucion": f"{W}x{H}"}
