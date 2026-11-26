@@ -1,0 +1,44 @@
+name: VIRALFORGE · Montar Short
+run-name: VIRALFORGE render ${{ inputs.id }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      id:
+        description: "Código del vídeo (p. ej. VF-0001)"
+        required: true
+      job_url:
+        description: "URL pública del encargo job.json"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: viralforge/render
+
+      - name: Instalar ffmpeg y fuentes
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+
+      - name: Descargar encargo
+        env:
+          JOB_URL: ${{ inputs.job_url }}
+        run: curl -fsSL "$JOB_URL" -o job.json
+
+      - name: Montar vídeo
+        run: python3 viralforge/render/render.py job.json
+
+      - name: Guardar resultado
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.id }}
+          path: out/
+          retention-days: 7
