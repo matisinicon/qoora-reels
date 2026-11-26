@@ -1,0 +1,766 @@
+{
+ "id": "qoora-presentacion",
+ "line": "dark",
+ "voice": "presentacion/voz_presentacion.mp3",
+ "script": [
+  "Tu empresa no necesita otro chatbot.",
+  "Necesita seis agentes.",
+  "Un chatbot contesta preguntas.",
+  "Un agente investiga, decide… y actúa.",
+  "Incluso a las tres de la madrugada.",
+  {
+   "say": "Somos Córa.",
+   "show": "Somos QOORA."
+  },
+  "Ingeniería de inteligencia agéntica.",
+  "Diseñamos agentes especializados.",
+  "Investigación. Datos. Estrategia. Operaciones. Atención al cliente. Automatización.",
+  "Y los hacemos trabajar juntos, como un equipo.",
+  "Los conectamos con lo que ya usas:",
+  "tu CRM, tus bases de datos, tus herramientas.",
+  "Una orden se convierte en acciones.",
+  "Una tarea manual… en un proceso que funciona solo.",
+  "Y siempre con personas al mando:",
+  "el agente propone, tú apruebas.",
+  "No automatices tareas. Construye inteligencia.",
+  "¿Qué agente necesita tu negocio?",
+  "Comenta AGENTE."
+ ],
+ "words": [
+  [
+   "Tu",
+   0.0,
+   0.16
+  ],
+  [
+   "empresa",
+   0.4,
+   0.64
+  ],
+  [
+   "no",
+   0.72,
+   0.8
+  ],
+  [
+   "necesita",
+   0.88,
+   1.36
+  ],
+  [
+   "otro",
+   1.44,
+   1.68
+  ],
+  [
+   "chatbot.",
+   1.8,
+   2.24
+  ],
+  [
+   "Necesita",
+   2.56,
+   3.12
+  ],
+  [
+   "seis",
+   3.28,
+   3.52
+  ],
+  [
+   "agentes.",
+   3.6,
+   4.4
+  ],
+  [
+   "Un",
+   4.56,
+   4.64
+  ],
+  [
+   "chatbot",
+   4.72,
+   5.2
+  ],
+  [
+   "contesta",
+   5.32,
+   5.68
+  ],
+  [
+   "preguntas.",
+   5.76,
+   6.44
+  ],
+  [
+   "Un",
+   6.56,
+   6.64
+  ],
+  [
+   "agente",
+   6.72,
+   7.12
+  ],
+  [
+   "investiga,",
+   7.28,
+   8.16
+  ],
+  [
+   "decide…",
+   8.28,
+   9.04
+  ],
+  [
+   "y",
+   9.08,
+   9.12
+  ],
+  [
+   "actúa.",
+   9.2,
+   9.76
+  ],
+  [
+   "Incluso",
+   10.08,
+   10.48
+  ],
+  [
+   "a",
+   10.52,
+   10.56
+  ],
+  [
+   "las",
+   10.64,
+   10.72
+  ],
+  [
+   "tres",
+   10.8,
+   10.96
+  ],
+  [
+   "de",
+   11.04,
+   11.12
+  ],
+  [
+   "la",
+   11.16,
+   11.2
+  ],
+  [
+   "madrugada.",
+   11.28,
+   11.84
+  ],
+  [
+   "Somos",
+   12.24,
+   12.64
+  ],
+  [
+   "Córa.",
+   12.72,
+   13.12
+  ],
+  [
+   "Ingeniería",
+   13.36,
+   14.0
+  ],
+  [
+   "de",
+   14.04,
+   14.08
+  ],
+  [
+   "inteligencia",
+   14.16,
+   14.8
+  ],
+  [
+   "agéntica.",
+   14.88,
+   15.52
+  ],
+  [
+   "Diseñamos",
+   15.76,
+   16.24
+  ],
+  [
+   "agentes",
+   16.32,
+   16.72
+  ],
+  [
+   "especializados.",
+   16.8,
+   17.8
+  ],
+  [
+   "Investigación.",
+   17.92,
+   18.8
+  ],
+  [
+   "Datos.",
+   19.12,
+   19.72
+  ],
+  [
+   "Estrategia.",
+   19.84,
+   20.68
+  ],
+  [
+   "Operaciones.",
+   20.8,
+   21.6
+  ],
+  [
+   "Atención",
+   21.68,
+   22.16
+  ],
+  [
+   "al",
+   22.24,
+   22.32
+  ],
+  [
+   "cliente.",
+   22.4,
+   22.96
+  ],
+  [
+   "Automatización.",
+   23.04,
+   24.08
+  ],
+  [
+   "Y",
+   24.24,
+   24.32
+  ],
+  [
+   "los",
+   24.4,
+   24.48
+  ],
+  [
+   "hacemos",
+   24.56,
+   24.88
+  ],
+  [
+   "trabajar",
+   24.92,
+   25.28
+  ],
+  [
+   "juntos,",
+   25.36,
+   26.08
+  ],
+  [
+   "como",
+   26.2,
+   26.32
+  ],
+  [
+   "un",
+   26.4,
+   26.48
+  ],
+  [
+   "equipo.",
+   26.56,
+   27.08
+  ],
+  [
+   "Los",
+   27.2,
+   27.36
+  ],
+  [
+   "conectamos",
+   27.4,
+   27.84
+  ],
+  [
+   "con",
+   27.92,
+   28.0
+  ],
+  [
+   "lo",
+   28.08,
+   28.12
+  ],
+  [
+   "que",
+   28.16,
+   28.24
+  ],
+  [
+   "ya",
+   28.32,
+   28.4
+  ],
+  [
+   "usas:",
+   28.48,
+   29.12
+  ],
+  [
+   "tu",
+   29.16,
+   29.2
+  ],
+  [
+   "CRM,",
+   29.28,
+   30.16
+  ],
+  [
+   "tus",
+   30.213,
+   30.32
+  ],
+  [
+   "bases",
+   30.4,
+   30.64
+  ],
+  [
+   "de",
+   30.68,
+   30.72
+  ],
+  [
+   "datos,",
+   30.8,
+   31.36
+  ],
+  [
+   "tus",
+   31.4,
+   31.52
+  ],
+  [
+   "herramientas.",
+   31.6,
+   32.32
+  ],
+  [
+   "Una",
+   32.56,
+   32.72
+  ],
+  [
+   "orden",
+   32.8,
+   33.12
+  ],
+  [
+   "se",
+   33.2,
+   33.28
+  ],
+  [
+   "convierte",
+   33.36,
+   33.76
+  ],
+  [
+   "en",
+   33.84,
+   33.92
+  ],
+  [
+   "acciones.",
+   34.24,
+   34.68
+  ],
+  [
+   "Una",
+   34.8,
+   34.96
+  ],
+  [
+   "tarea",
+   35.04,
+   35.28
+  ],
+  [
+   "manual…",
+   35.52,
+   35.92
+  ],
+  [
+   "en",
+   36.0,
+   36.08
+  ],
+  [
+   "un",
+   36.12,
+   36.16
+  ],
+  [
+   "proceso",
+   36.24,
+   36.64
+  ],
+  [
+   "que",
+   36.72,
+   36.8
+  ],
+  [
+   "funciona",
+   36.88,
+   37.36
+  ],
+  [
+   "solo.",
+   37.52,
+   38.0
+  ],
+  [
+   "Y",
+   38.04,
+   38.08
+  ],
+  [
+   "siempre",
+   38.24,
+   38.64
+  ],
+  [
+   "con",
+   38.72,
+   38.8
+  ],
+  [
+   "personas",
+   38.88,
+   39.36
+  ],
+  [
+   "al",
+   39.44,
+   39.52
+  ],
+  [
+   "mando:",
+   39.68,
+   40.08
+  ],
+  [
+   "el",
+   40.16,
+   40.24
+  ],
+  [
+   "agente",
+   40.32,
+   40.56
+  ],
+  [
+   "propone,",
+   40.64,
+   41.36
+  ],
+  [
+   "tú",
+   41.413,
+   41.52
+  ],
+  [
+   "apruebas.",
+   41.76,
+   42.56
+  ],
+  [
+   "No",
+   42.72,
+   42.8
+  ],
+  [
+   "automatices",
+   43.08,
+   43.44
+  ],
+  [
+   "tareas.",
+   43.52,
+   44.12
+  ],
+  [
+   "Construye",
+   44.24,
+   44.88
+  ],
+  [
+   "inteligencia.",
+   45.0,
+   45.88
+  ],
+  [
+   "¿Qué",
+   46.0,
+   46.08
+  ],
+  [
+   "agente",
+   46.16,
+   46.56
+  ],
+  [
+   "necesita",
+   46.6,
+   47.04
+  ],
+  [
+   "tu",
+   47.08,
+   47.12
+  ],
+  [
+   "negocio?",
+   47.2,
+   47.92
+  ],
+  [
+   "Comenta",
+   48.0,
+   48.4
+  ],
+  [
+   "AGENTE.",
+   48.64,
+   49.44
+  ]
+ ],
+ "scenes": [
+  {
+   "type": "hook_burst",
+   "phrases": [
+    0,
+    1
+   ],
+   "title": "Tu empresa no necesita otro chatbot.",
+   "accent": "chatbot.",
+   "bubble": "¿En qué puedo ayudarte?",
+   "strikeWord": "chatbot",
+   "burstWord": "seis",
+   "count": 6,
+   "big": "6 agentes",
+   "bigAccent": "6"
+  },
+  {
+   "type": "versus",
+   "phrases": [
+    2,
+    4
+   ],
+   "title": "Contestar no es trabajar.",
+   "accent": "trabajar.",
+   "left": {
+    "label": "CHATBOT",
+    "lines": [
+     "¿Horario?",
+     "De 9 a 18 h."
+    ],
+    "end": "FIN DE LA CONVERSACIÓN"
+   },
+   "right": {
+    "label": "AGENTE",
+    "steps": [
+     {
+      "label": "INVESTIGA",
+      "word": "investiga"
+     },
+     {
+      "label": "DECIDE",
+      "word": "decide"
+     },
+     {
+      "label": "ACTÚA",
+      "word": "actúa"
+     }
+    ]
+   },
+   "badge": {
+    "text": "03:00 · ACTIVO",
+    "word": "tres"
+   }
+  },
+  {
+   "type": "core_reveal",
+   "phrases": [
+    5,
+    6
+   ],
+   "name": "QOORA AI",
+   "nameAccent": "AI",
+   "tagline": "INGENIERÍA DE INTELIGENCIA AGÉNTICA",
+   "nameWord": "Somos",
+   "taglineWord": "Ingeniería"
+  },
+  {
+   "type": "system",
+   "phrases": [
+    7,
+    11
+   ],
+   "titles": [
+    {
+     "text": "Agentes especializados",
+     "accent": "especializados",
+     "word": "Diseñamos"
+    },
+    {
+     "text": "Trabajan como un equipo",
+     "accent": "un equipo",
+     "word": "hacemos"
+    },
+    {
+     "text": "Conectados a lo que ya usas",
+     "accent": "ya usas",
+     "word": "conectamos"
+    }
+   ],
+   "modules": [
+    {
+     "label": "INVESTIGACIÓN",
+     "word": "Investigación"
+    },
+    {
+     "label": "DATOS",
+     "word": "Datos"
+    },
+    {
+     "label": "ESTRATEGIA",
+     "word": "Estrategia"
+    },
+    {
+     "label": "OPERACIONES",
+     "word": "Operaciones"
+    },
+    {
+     "label": "ATENCIÓN",
+     "word": "Atención"
+    },
+    {
+     "label": "AUTOMATIZACIÓN",
+     "word": "Automatización"
+    }
+   ],
+   "teamWord": "hacemos",
+   "tools": [
+    {
+     "label": "CRM",
+     "word": "CRM"
+    },
+    {
+     "label": "BASE DE DATOS",
+     "word": "bases"
+    },
+    {
+     "label": "EMAIL",
+     "word": "herramientas"
+    },
+    {
+     "label": "CALENDARIO",
+     "word": "herramientas"
+    },
+    {
+     "label": "DOCUMENTOS",
+     "word": "herramientas"
+    },
+    {
+     "label": "APIs",
+     "word": "herramientas"
+    }
+   ],
+   "toolsWord": "conectamos"
+  },
+  {
+   "type": "command_split",
+   "phrases": [
+    12,
+    12
+   ],
+   "title": "Una orden. Varias acciones.",
+   "accent": "Varias acciones.",
+   "command": "Prepara el informe semanal",
+   "actions": [
+    "BUSCAR DATOS",
+    "ANALIZAR",
+    "REDACTAR",
+    "ENVIAR"
+   ],
+   "word": "acciones"
+  },
+  {
+   "type": "pipeline",
+   "phrases": [
+    13,
+    13
+   ],
+   "title": "De tarea manual a proceso",
+   "accent": "proceso",
+   "from": "MANUAL",
+   "to": "AUTOMÁTICO",
+   "steps": [
+    "BUSCAR DATOS",
+    "ANALIZAR",
+    "REDACTAR",
+    "ENVIAR"
+   ],
+   "word": "proceso"
+  },
+  {
+   "type": "approval",
+   "phrases": [
+    14,
+    15
+   ],
+   "title": "Personas al mando",
+   "accent": "al mando",
+   "proposal": "Enviar informe a dirección",
+   "proposeWord": "propone",
+   "approveWord": "apruebas",
+   "result": "EJECUCIÓN"
+  },
+  {
+   "type": "manifesto",
+   "phrases": [
+    16,
+    16
+   ],
+   "line1": "No automatices tareas.",
+   "line2": "Construye inteligencia.",
+   "accent": "inteligencia.",
+   "en": "DON'T JUST AUTOMATE TASKS. ENGINEER INTELLIGENCE.",
+   "word": "Construye"
+  },
+  {
+   "type": "cta_dark",
+   "phrases": [
+    17,
+    18
+   ],
+   "question": "¿Qué agente necesita tu negocio?",
+   "accent": "tu negocio?",
+   "ctaWord": "Comenta"
+  }
+ ]
+}
