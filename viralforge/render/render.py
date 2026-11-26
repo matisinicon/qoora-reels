@@ -143,6 +143,7 @@ def main():
             normalizar_clip(origen, destino, seg)
         elif e.get("imagen_url"):
             origen = descargar(e["imagen_url"], f"{WORK}/img_{i:02d}.img")
+            shutil.copy(origen, f"{OUT}/escena_{i + 1:02d}.img")  # copia permanente del fotograma
             imagen_a_clip(origen, destino, seg, i)
         else:
             raise SystemExit(f"La escena {i + 1} no tiene clip ni imagen")

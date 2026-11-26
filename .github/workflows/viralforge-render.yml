@@ -40,7 +40,7 @@ jobs:
             nombre=$(basename "$job" .json)
             rm -rf out work
             if python3 viralforge/render/render.py "$job"; then
-              gh release create "$nombre" out/video.mp4 out/portada.jpg out/hoja.jpg out/info.json out/voz.mp3 \
+              gh release create "$nombre" out/video.mp4 out/portada.jpg out/hoja.jpg out/info.json out/voz.mp3 $(ls out/escena_*.img 2>/dev/null) \
                 --title "$nombre" --notes "Vídeo VIRALFORGE montado automáticamente" --target "$GITHUB_SHA" --latest=false
             else
               mkdir -p out
