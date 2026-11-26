@@ -6,7 +6,8 @@ import "./fuente";
 import { Palabra } from "./tipos";
 import { Reparto } from "./kit/Capas";
 
-export type HistoriaProps = { id: string; voz: string; musica: string | null; volumenMusica: number; palabras: Palabra[]; escenas: EscenaKit[]; titulo?: string; reparto?: Reparto; portada?: boolean };
+export type Sonido = { t: number; nombre: string; vol: number };
+export type HistoriaProps = { id: string; voz: string; sonidos?: Sonido[]; volumenEfectos?: number; musica: string | null; volumenMusica: number; palabras: Palabra[]; escenas: EscenaKit[]; titulo?: string; reparto?: Reparto; portada?: boolean };
 
 export const Historia: React.FC<HistoriaProps> = (p) => {
   const { fps, durationInFrames } = useVideoConfig();
@@ -35,6 +36,11 @@ export const Historia: React.FC<HistoriaProps> = (p) => {
         </>
       )}
       {p.portada ? null : <Audio src={staticFile(p.voz)} />}
+      {p.portada ? null : (p.sonidos ?? []).map((x, i) => (
+        <Sequence key={"sfx" + i} from={Math.max(Math.round(x.t * fps), 0)} durationInFrames={Math.round(3 * fps)}>
+          <Audio src={staticFile(`sfx/${x.nombre}.mp3`)} volume={Math.min(x.vol * (p.volumenEfectos ?? 1), 1)} />
+        </Sequence>
+      ))}
       {p.musica ? <Audio src={staticFile(p.musica)} volume={p.volumenMusica} loop /> : null}
     </AbsoluteFill>
   );

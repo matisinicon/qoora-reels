@@ -2,6 +2,7 @@
 // Uso: node preparar.mjs ../jobs/VF-0002.json
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 
 const jobPath = process.argv[2];
 if (!jobPath) throw new Error("Falta la ruta del encargo");
@@ -19,9 +20,73 @@ async function bajar(url, nombre) {
 
 // Normaliza una palabra para poder compararla (sin tildes ni signos)
 const norm = (w) => String(w).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9ñ]/g, "");
-const palabras = (job.palabras || []).map((w) => (Array.isArray(w) ? { t: String(w[0]), s: +w[1], e: +w[2] } : { t: String(w.texto), s: +w.inicio, e: +w.fin }));
+let palabras = (job.palabras || []).map((w) => (Array.isArray(w) ? { t: String(w[0]), s: +w[1], e: +w[2] } : { t: String(w.texto), s: +w.inicio, e: +w.fin }));
+
+// ── Ritmo: quita las pausas largas de la voz y recoloca los tiempos de cada palabra ──
+function quitarPausas(origen, destino, pal, maxPausa = 0.12, deja = 0.07) {
+  if (!pal.length) { fs.copyFileSync(origen, destino); return pal; }
+  const tramos = []; // [inicio, fin] del audio original que se conserva
+  let ini = Math.max(pal[0].s - 0.04, 0);
+  for (let i = 0; i < pal.length - 1; i++) {
+    const hueco = pal[i + 1].s - pal[i].e;
+    if (hueco > maxPausa) {
+      tramos.push([ini, pal[i].e + deja / 2]);
+      ini = pal[i + 1].s - deja / 2;
+    }
+  }
+  tramos.push([ini, pal[pal.length - 1].e + 0.12]);
+  const expr = tramos.map(([a, b]) => `between(t,${a.toFixed(3)},${b.toFixed(3)})`).join("+");
+  execFileSync("ffmpeg", ["-y", "-v", "error", "-i", origen, "-af", `aselect='${expr}',asetpts=N/SR/TB`, "-ar", "44100", "-b:a", "192k", destino]);
+  // tiempo nuevo = tiempo original menos todo lo recortado antes
+  const nuevo = (t) => {
+    let quitado = tramos[0][0];
+    for (let k = 1; k < tramos.length; k++) { if (t >= tramos[k][0]) quitado += tramos[k][0] - tramos[k - 1][1]; else break; }
+    return Math.max(t - quitado, 0);
+  };
+  const salida = pal.map((w) => ({ ...w, s: +nuevo(w.s).toFixed(3), e: +nuevo(w.e).toFixed(3) }));
+  const antes = pal[pal.length - 1].e, despues = salida[salida.length - 1].e;
+  console.log(`Ritmo: ${tramos.length - 1} pausas recortadas, voz de ${antes.toFixed(1)} s a ${despues.toFixed(1)} s`);
+  return salida;
+}
+
+// ── Efectos de sonido: se colocan solos según lo que pasa en cada escena ──
+const SFX = ["whoosh", "pop", "ding", "boing", "impacto", "tension", "explosion", "scratch", "tictac", "silbato"];
+function planSonidos(escenas) {
+  const ev = [];
+  const poner = (t, nombre, vol) => { if (SFX.includes(nombre) && t >= 0) ev.push({ t: +t.toFixed(3), nombre, vol }); };
+  escenas.forEach((e, i) => {
+    const dur = e.hasta - e.desde;
+    if (e.sonido) poner(e.desde, e.sonido, 0.55);
+    else if (i === 0) poner(0, "impacto", 0.55);
+    else poner(Math.max(e.desde - 0.08, 0), i % 3 === 2 ? "silbato" : "whoosh", 0.32);
+    if (e.camara === "temblor") poner(e.desde + 0.05, "impacto", 0.45);
+    let pops = 0;
+    for (const x of e.elementos || []) {
+      const t = e.desde + (Number(x.en) || 0) * dur + 0.05;
+      const n = String(x.nombre || x.tipo || "");
+      if (x.sonido) poner(t, x.sonido, 0.5);
+      else if (x.tipo === "efecto" && n === "explosion") poner(t, "explosion", 0.5);
+      else if (x.tipo === "efecto" && n === "destello") poner(t, "ding", 0.4);
+      else if (x.tipo === "contador") poner(t, "tictac", 0.4);
+      else if (n === "interrogacion") poner(t, "boing", 0.45);
+      else if (n === "exclamacion") poner(t, "scratch", 0.45);
+      else if (n === "bombilla" || n === "check") poner(t, "ding", 0.45);
+      else if (n === "reloj") poner(t, "tictac", 0.35);
+      else if (x.entra === "pop" && pops < 1 && Number(x.en) > 0.05) { poner(t, "pop", 0.4); pops++; }
+    }
+  });
+  // tensión justo antes de la escena final (la revelación)
+  if (escenas.length > 3) { const u = escenas[escenas.length - 1]; poner(Math.max(u.desde - 1.6, 0), "tension", 0.35); }
+  ev.sort((a, b) => a.t - b.t);
+  const limpio = [];
+  for (const x of ev) if (!limpio.length || x.t - limpio[limpio.length - 1].t >= 0.35) limpio.push(x);
+  return limpio;
+}
 
 if (job.composicion === "Historia") {
+  await bajar(job.voz_url, "voz_original.mp3");
+  palabras = job.sin_recorte_pausas ? palabras : quitarPausas(path.join(dir, "voz_original.mp3"), path.join(dir, "voz.mp3"), palabras, job.pausa_max ?? 0.12);
+  if (job.sin_recorte_pausas) fs.copyFileSync(path.join(dir, "voz_original.mp3"), path.join(dir, "voz.mp3"));
   // Cada escena trae el fragmento de narración donde empieza: se busca en orden en las palabras de la voz
   const pal = palabras.map((w) => norm(w.t));
   let cursor = 0;
@@ -38,19 +103,20 @@ if (job.composicion === "Historia") {
     return { ...e, _pos: pos };
   });
   const out = escenas.map((e, i) => {
-    const desde = i === 0 ? 0 : Math.max(palabras[e._pos].s - 0.12, 0);
+    const desde = i === 0 ? 0 : Math.max(palabras[e._pos].s - 0.08, 0);
     const sig = escenas[i + 1];
-    const hasta = sig ? Math.max(palabras[sig._pos].s - 0.12, desde + 0.4) : palabras[palabras.length - 1].e + 0.6;
+    const hasta = sig ? Math.max(palabras[sig._pos].s - 0.08, desde + 0.4) : palabras[palabras.length - 1].e + 0.4;
     const { _pos, texto, ...resto } = e;
     return { ...resto, desde, hasta };
   });
   const props = {
     id: job.id, titulo: job.titulo || "", reparto: job.reparto || {}, palabras, escenas: out,
-    voz: await bajar(job.voz_url, "voz.mp3"), musica: job.musica_url ? await bajar(job.musica_url, "musica.mp3") : null, volumenMusica: job.volumen_musica ?? 0.1,
+    sonidos: job.sin_efectos ? [] : planSonidos(out), volumenEfectos: job.volumen_efectos ?? 1,
+    voz: "job/voz.mp3", musica: job.musica_url ? await bajar(job.musica_url, "musica.mp3") : null, volumenMusica: job.volumen_musica ?? 0.1,
   };
   fs.writeFileSync(path.join(dir, "props.json"), JSON.stringify(props, null, 1));
   fs.writeFileSync(path.join(dir, "composicion.txt"), "Historia");
-  console.log(`Encargo ${job.id} (Historia): ${out.length} escenas, ${palabras.length} palabras`);
+  console.log(`Encargo ${job.id} (Historia): ${out.length} escenas, ${palabras.length} palabras, ${props.sonidos.length} efectos de sonido`);
   out.forEach((e, i) => console.log(`  escena ${i + 1}: ${e.desde.toFixed(2)}–${e.hasta.toFixed(2)} s`));
   process.exit(0);
 }
