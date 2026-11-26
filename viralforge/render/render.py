@@ -17,6 +17,7 @@ Formato del encargo:
 }
 """
 import json
+import shutil
 import os
 import subprocess
 import sys
@@ -122,6 +123,7 @@ def main():
     os.makedirs(OUT, exist_ok=True)
 
     voz = descargar(job["voz_url"], f"{WORK}/voz.mp3")
+    shutil.copy(voz, f"{OUT}/voz.mp3")  # copia permanente de la locución (las URL de origen caducan)
     dur_voz = duracion(voz)
     escenas = sorted(job["escenas"], key=lambda e: e.get("orden", 0))
     if not escenas:
