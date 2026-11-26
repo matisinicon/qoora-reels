@@ -1,0 +1,30 @@
+name: VIRALFORGE · biblioteca de efectos de sonido
+on:
+  push:
+    paths: ['viralforge/assets/sfx.txt']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sfx:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descargar y preparar efectos
+        run: |
+          sudo apt-get -qq update && sudo apt-get -qq install -y ffmpeg >/dev/null
+          mkdir -p viralforge/remotion/public/sfx
+          while read -r nombre url; do
+            [ -z "$nombre" ] && continue
+            curl -sfL "$url" -o "/tmp/$nombre.mp3"
+            # quita silencio inicial y final, normaliza volumen y deja un fundido corto al final
+            ffmpeg -y -loglevel error -i "/tmp/$nombre.mp3" -af "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,loudnorm=I=-16:TP=-1.5" -ar 44100 -ac 2 -b:a 160k "viralforge/remotion/public/sfx/$nombre.mp3"
+            echo "$nombre: $(ffprobe -v error -show_entries format=duration -of csv=p=0 viralforge/remotion/public/sfx/$nombre.mp3)s"
+          done < viralforge/assets/sfx.txt
+      - name: Guardar en el repositorio
+        run: |
+          git config user.name "viralforge-bot"
+          git config user.email "viralforge-bot@users.noreply.github.com"
+          git add viralforge/remotion/public/sfx
+          git commit -m "VIRALFORGE: biblioteca de efectos de sonido" || echo "sin cambios"
+          git push
