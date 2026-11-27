@@ -565,3 +565,19 @@ cualquier paso: 3 fallos → fallido (y aviso).  Otros estados finales: hecho, c
   - la recomendación de METRICS.
   La orden es copiar el **formato** con **otra historia y otro dato real**.
 - **Primer análisis real (27/11):** 9 canales suscritos, entre ellos Ricks Clips, Weird Little Facts, Un Minuto de Porqués, Timeless moments, ZooBow Animations, Knox Clips y sabiasque.ia4. Salieron 10 referencias (por ejemplo «Why They Put Tires on a Train», con 8,5 M de visitas en 2 días), 6 temas y 23 recursos narrativos. Patrón dominante: «acción absurda → resultado práctico o sorprendente».
+
+### 27/11/2026: ojos y oídos (Gemini)
+- **Nuevo workflow VF·01b «SCOUT · Ojos y oídos (Gemini)»** (`wqLogOPg75gAJFBk`):
+  - Se ejecuta a las 01:36, 01:42, 01:48, 01:54 y 02:00 y analiza **1 vídeo por ejecución**, porque Gemini tarda 60-90 s y n8n corta a los 180 s.
+  - Pasa a Gemini el **enlace de YouTube** del vídeo de referencia, sin descargarlo: Gemini lo ve y lo escucha.
+  - Devuelve la transcripción exacta, la primera frase, el gancho de los 3 primeros segundos y la estructura con tiempos.
+  - También el ritmo (planos, segundos por plano, palabras por minuto), lo que se ve (personajes, escenarios, objetos, estilo, textos, subtítulos, cámara) y el sonido (voz, música, efectos).
+  - Por último, por qué funciona, qué copiar y qué no copiar.
+- **Dónde se guarda:** `referencias.analisis_ojos` (`medidas` + `vision`); también rellena `transcripcion`, `estilo_animacion`, `tipo_hook` y `tipo_historia`.
+- **Funciones SQL:** `ojos_pendientes` (reclama referencias sin analizar, priorizando los outliers; como máximo 2 intentos por vídeo) y `guardar_ojos`.
+- **Credencial:** «Google Gemini(PaLM) Api account» (clave de Google AI Studio, plan gratis).
+- **Modelo:** `configuracion.gemini_modelo` = `gemini-3.5-flash`. Avisos: `gemini-2.5-flash` ya no está disponible para cuentas nuevas, y `gemini-3.8-flash` y `gemini-flash-latest` daban 503 por saturación.
+- **Descarte:** se probó a descargar los vídeos con yt-dlp desde GitHub Actions (`.github/workflows/viralforge-ojos.yml`, `viralforge/ojos/analizar.py`), pero YouTube lo bloquea («confirma que no eres un bot»). Ese camino queda sin usar.
+- **STORYLAB** pasa a las 02:20 y da prioridad a los datos vistos y oídos.
+- **SCRIPTOR:** `contexto_scriptor.referencias_top` incluye `visto_y_escuchado` (primera frase, gancho visual, estructura, ritmo, palabras por minuto, segundos por plano, revelación, cierre, sonido y transcripción).
+- **Primeros resultados:** las referencias que mejor funcionan hablan a **~190 palabras por minuto**, cambian de plano cada **2,3-3,2 s**, empiezan a hablar en el segundo 0 y usan subtítulos de 1-2 palabras en amarillo y blanco, música de fondo continua y efectos en cada acción.
