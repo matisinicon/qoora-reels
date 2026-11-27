@@ -1,0 +1,37 @@
+name: VIRALFORGE · Ojos y oídos (analizar referencias)
+on:
+  push:
+    paths: ['viralforge/analisis/*.json']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: viralforge-ojos
+  cancel-in-progress: false
+jobs:
+  analizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 2 }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Instalar herramientas
+        run: |
+          sudo apt-get -qq update && sudo apt-get -qq install -y ffmpeg fonts-dejavu-core >/dev/null
+          pip install -q -U yt-dlp faster-whisper
+      - name: Analizar encargos nuevos
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for enc in $(git diff --name-only HEAD~1 HEAD -- 'viralforge/analisis/*.json'); do
+            [ -f "$enc" ] || continue
+            nombre=$(basename "$enc" .json)
+            python3 viralforge/ojos/analizar.py "$enc" "salida/$nombre" || true
+            [ -f "salida/$nombre/resultados.json" ] || echo '{"videos":[],"error":"el análisis falló"}' > "salida/$nombre/resultados.json"
+            gh release create "$nombre" salida/$nombre/resultados.json $(ls salida/$nombre/*.jpg 2>/dev/null) \
+              --title "$nombre (análisis de referencias)" --notes "Ojos y oídos de SCOUT" --target "$GITHUB_SHA" --latest=false
+            cb=$(python3 -c "import json,sys;print(json.load(open('$enc')).get('callback_url',''))")
+            if [ -n "$cb" ]; then curl -s -X POST -H 'Content-Type: application/json' -d "{\"release\":\"$nombre\"}" "$cb" || true; fi
+          done
