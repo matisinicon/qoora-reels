@@ -1,30 +1,41 @@
-name: VIRALFORGE · biblioteca de efectos de sonido
+name: viralforge-sfx
 on:
-  push:
-    paths: ['viralforge/assets/sfx.txt']
   workflow_dispatch:
+    inputs:
+      lista:
+        description: "nombre|url por línea"
+        required: true
 permissions:
   contents: write
 jobs:
-  sfx:
+  bajar:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Descargar y preparar efectos
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Descargar y normalizar
+        env:
+          LISTA: ${{ inputs.lista }}
         run: |
-          sudo apt-get -qq update && sudo apt-get -qq install -y ffmpeg >/dev/null
-          mkdir -p viralforge/remotion/public/sfx
-          while read -r nombre url; do
+          set -e
+          D=viralforge/remotion/public/sfx
+          mkdir -p $D /tmp/crudo
+          printf '%s\n' "$LISTA" | while IFS='|' read -r nombre url; do
             [ -z "$nombre" ] && continue
-            curl -sfL "$url" -o "/tmp/$nombre.mp3"
-            # quita silencio inicial y final, normaliza volumen y deja un fundido corto al final
-            ffmpeg -y -loglevel error -i "/tmp/$nombre.mp3" -af "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,loudnorm=I=-16:TP=-1.5" -ar 44100 -ac 2 -b:a 160k "viralforge/remotion/public/sfx/$nombre.mp3"
-            echo "$nombre: $(ffprobe -v error -show_entries format=duration -of csv=p=0 viralforge/remotion/public/sfx/$nombre.mp3)s"
-          done < viralforge/assets/sfx.txt
-      - name: Guardar en el repositorio
+            curl -sSfL -o "/tmp/crudo/$nombre.mp3" "$url"
+            if [[ "$nombre" == amb_* || "$nombre" == drone_* ]]; then
+              # ambientes: 60 s, bucle limpio, volumen bajo de base
+              ffmpeg -y -loglevel error -i "/tmp/crudo/$nombre.mp3" -t 60 -af "loudnorm=I=-26:TP=-3,afade=t=in:d=1,afade=t=out:st=58:d=2" -ac 1 -b:a 96k "$D/$nombre.mp3"
+            else
+              # efectos: quita silencio inicial, máx 8 s
+              ffmpeg -y -loglevel error -i "/tmp/crudo/$nombre.mp3" -af "silenceremove=start_periods=1:start_threshold=-50dB,atrim=0:8,loudnorm=I=-16:TP=-1.5,afade=t=out:st=7.6:d=0.4" -ac 1 -b:a 128k "$D/$nombre.mp3"
+            fi
+            echo "$nombre $(ffprobe -v error -show_entries format=duration -of csv=p=0 $D/$nombre.mp3)s"
+          done
+      - name: Guardar
         run: |
           git config user.name "viralforge-bot"
-          git config user.email "viralforge-bot@users.noreply.github.com"
+          git config user.email "bot@viralforge.local"
           git add viralforge/remotion/public/sfx
-          git commit -m "VIRALFORGE: biblioteca de efectos de sonido" || echo "sin cambios"
+          git commit -m "VIRALFORGE: biblioteca de efectos Epidemic Sound" || echo "sin cambios"
           git push
