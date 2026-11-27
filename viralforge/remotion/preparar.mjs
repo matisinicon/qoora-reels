@@ -88,7 +88,18 @@ function planSonidos(escenas) {
 }
 
 if (job.composicion === "Historia") {
-  await bajar(job.voz_url, "voz_original.mp3");
+  // La voz puede venir en mp3 (ElevenLabs) o wav (Gemini): siempre se pasa a mp3
+  const ext = (String(job.voz_url).split("?")[0].match(/\.(\w+)$/) || [, "mp3"])[1].toLowerCase();
+  await bajar(job.voz_url, `voz_descargada.${ext}`);
+  if (ext === "mp3") fs.renameSync(path.join(dir, "voz_descargada.mp3"), path.join(dir, "voz_original.mp3"));
+  else { execFileSync("ffmpeg", ["-y", "-v", "error", "-i", path.join(dir, `voz_descargada.${ext}`), "-ac", "1", "-ar", "44100", "-b:a", "160k", path.join(dir, "voz_original.mp3")]); fs.rmSync(path.join(dir, `voz_descargada.${ext}`)); }
+  // Sin tiempos por palabra (voz de Gemini): Whisper los saca y se alinean con la narración
+  if (!palabras.length) {
+    const salida = path.join(dir, "tiempos.json");
+    execFileSync("python3", [path.resolve("tiempos_whisper.py"), path.join(dir, "voz_original.mp3"), job.narracion || "", salida], { stdio: "inherit" });
+    palabras = JSON.parse(fs.readFileSync(salida, "utf8")).map((w) => ({ t: String(w[0]), s: +w[1], e: +w[2] }));
+    if (!palabras.length) throw new Error("Whisper no encontró palabras en la voz");
+  }
   palabras = job.sin_recorte_pausas ? palabras : quitarPausas(path.join(dir, "voz_original.mp3"), path.join(dir, "voz.mp3"), palabras, job.pausa_max ?? 0.12);
   if (job.sin_recorte_pausas) fs.copyFileSync(path.join(dir, "voz_original.mp3"), path.join(dir, "voz.mp3"));
   // Cada escena trae el fragmento de narración donde empieza: se busca en orden en las palabras de la voz
