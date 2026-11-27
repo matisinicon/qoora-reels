@@ -35,8 +35,12 @@ function quitarPausas(origen, destino, pal, maxPausa = 0.12, deja = 0.07) {
     }
   }
   tramos.push([ini, pal[pal.length - 1].e + 0.12]);
-  const expr = tramos.map(([a, b]) => `between(t,${a.toFixed(3)},${b.toFixed(3)})`).join("+");
-  execFileSync("ffmpeg", ["-y", "-v", "error", "-i", origen, "-af", `aselect='${expr}',asetpts=N/SR/TB`, "-ar", "44100", "-b:a", "192k", destino]);
+  // cada tramo se recorta por separado y se encadenan (más fiable que aselect en cualquier versión de ffmpeg)
+  const partes = tramos.map(([a, b], k) => `[0:a]atrim=start=${a.toFixed(3)}:end=${b.toFixed(3)},asetpts=PTS-STARTPTS,afade=t=in:d=0.005,afade=t=out:st=${Math.max(b - a - 0.006, 0).toFixed(3)}:d=0.006[p${k}]`);
+  const grafo = partes.join(";") + ";" + tramos.map((_, k) => `[p${k}]`).join("") + `concat=n=${tramos.length}:v=0:a=1[out]`;
+  execFileSync("ffmpeg", ["-y", "-v", "error", "-i", origen, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-b:a", "192k", destino]);
+  const real = Number(execFileSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", destino]).toString().trim());
+  console.log(`Voz recortada: ${real.toFixed(2)} s en el archivo`);
   // tiempo nuevo = tiempo original menos todo lo recortado antes
   const nuevo = (t) => {
     let quitado = tramos[0][0];
