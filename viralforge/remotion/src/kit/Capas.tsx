@@ -6,6 +6,7 @@ import { Personaje, PersonajeProps } from "./Personaje";
 import { Contador, Explosion, Flecha, VistaPeriscopio } from "./Objetos";
 import { TINTA } from "./estilo";
 import { CamaraCtx } from "./camara";
+import { Atmosfera } from "./Atmosfera";
 
 // Escena genérica por capas: FRAME la describe en JSON y Remotion la dibuja.
 export type Elemento = {
@@ -24,10 +25,10 @@ export type Elemento = {
   desde?: number; hasta_valor?: number; sufijo?: string; etiqueta?: string; angulo?: number;
   props?: Record<string, any>; // parámetros del objeto o del personaje (expresion, brazo, hablando…)
 };
-export type EscenaCapas = { fondo: FondoSpec; vista?: "normal" | "periscopio"; elementos: Elemento[] };
+export type EscenaCapas = { fondo: FondoSpec; vista?: "normal" | "periscopio"; elementos: Elemento[]; luz?: "izq" | "der"; atmosfera?: string; primer_plano?: { nombre?: string; svg?: string; x?: number } };
 export type Reparto = Record<string, Partial<PersonajeProps>>;
 
-const ElementoView: React.FC<{ e: Elemento; dur: number; reparto: Reparto; i: number }> = ({ e, dur, reparto, i }) => {
+const ElementoView: React.FC<{ e: Elemento; dur: number; reparto: Reparto; i: number; luz?: "izq" | "der" }> = ({ e, dur, reparto, i, luz }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t0 = Math.round((e.en ?? 0) * dur);
@@ -58,7 +59,7 @@ const ElementoView: React.FC<{ e: Elemento; dur: number; reparto: Reparto; i: nu
 
   if (e.tipo === "personaje") {
     const base = reparto[e.ref ?? ""] ?? {};
-    const pp = { ...base, ...(e.props ?? {}) } as PersonajeProps;
+    const pp = { luz, ...base, ...(e.props ?? {}) } as PersonajeProps;
     return (
       <g opacity={o} transform={`translate(${x} ${y}) rotate(${r})`}>
         <Personaje {...pp} x={0} y={0} escala={s} semilla={i} />
@@ -104,7 +105,9 @@ export const CapasView: React.FC<{ escena: EscenaCapas; dur: number; reparto: Re
   const contenido = (
     <g>
       <g transform={fondoT}><Fondo f={escena.fondo ?? { tipo: "liso" }} /></g>
-      {(escena.elementos ?? []).map((e, i) => <ElementoView key={i} e={e} dur={dur} reparto={reparto} i={i} />)}
+      {(escena.elementos ?? []).map((e, i) => <ElementoView key={i} e={e} dur={dur} reparto={reparto} i={i} luz={escena.luz ?? "izq"} />)}
+      <Atmosfera tipo={escena.atmosfera ?? "particulas"} luz={escena.luz ?? "izq"} />
+      {escena.primer_plano ? <PrimerPlano p={escena.primer_plano} /> : null}
     </g>
   );
   if (escena.vista === "periscopio") {
@@ -116,4 +119,17 @@ export const CapasView: React.FC<{ escena: EscenaCapas; dur: number; reparto: Re
     );
   }
   return contenido;
+};
+
+// Objeto desenfocado en primer plano (profundidad de campo reducida): grande, en una esquina inferior y con un paralaje mayor
+const PrimerPlano: React.FC<{ p: { nombre?: string; svg?: string; x?: number } }> = ({ p }) => {
+  const cam = React.useContext(CamaraCtx);
+  const C = p.nombre ? BIBLIOTECA[p.nombre] : undefined;
+  const x = p.x ?? 120;
+  return (
+    <g transform={`translate(${x + cam.x * 0.6} ${1880 + cam.y * 0.6}) scale(1.5)`} filter="url(#desenfoque)" opacity={0.95}>
+      <defs><filter id="desenfoque" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9" /></filter></defs>
+      {C ? <C id="pp" inicio={0} /> : p.svg ? <g dangerouslySetInnerHTML={{ __html: limpiarSvg(p.svg) }} /> : <ellipse rx={160} ry={110} fill="#3F7A3A" />}
+    </g>
+  );
 };

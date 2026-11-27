@@ -131,6 +131,10 @@ if (job.composicion === "Historia") {
   };
   fs.writeFileSync(path.join(dir, "props.json"), JSON.stringify(props, null, 1));
   fs.writeFileSync(path.join(dir, "composicion.txt"), "Historia");
+  // Portada hecha a propósito (diseño de FRAME); si no hay diseño, montar.sh usa la de respaldo
+  if (job.portada && typeof job.portada === "object") {
+    fs.writeFileSync(path.join(dir, "portada_props.json"), JSON.stringify({ diseno_portada: job.portada, reparto: job.reparto || {}, titulo: job.titulo || "" }, null, 1));
+  } else if (fs.existsSync(path.join(dir, "portada_props.json"))) fs.rmSync(path.join(dir, "portada_props.json"));
   console.log(`Encargo ${job.id} (Historia): ${out.length} escenas, ${palabras.length} palabras, ${props.sonidos.length} efectos de sonido`);
   out.forEach((e, i) => console.log(`  escena ${i + 1}: ${e.desde.toFixed(2)}–${e.hasta.toFixed(2)} s`));
   process.exit(0);

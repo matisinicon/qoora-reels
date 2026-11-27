@@ -172,20 +172,17 @@ export const Camara: React.FC<{ tipo?: string; dur: number; children: React.Reac
   const golpe = spring({ frame: f, fps, config: { damping: 14, stiffness: 220 } });
   const p = interpolate(f, [0, dur], [0, 1], { extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
   let s = 1, x = 0, y = 0, r = 0;
+  // Directriz: UN solo movimiento de cámara suave y continuo por escena; nada de tirones ni temblores
   switch (tipo) {
-    case "fija": s = 1.02; break;
-    case "alejar": s = 1.16 - p * 0.14; break;
-    case "pan_der": s = 1.12; x = interpolate(p, [0, 1], [70, -70]); break;
-    case "pan_izq": s = 1.12; x = interpolate(p, [0, 1], [-70, 70]); break;
-    case "subir": s = 1.1; y = interpolate(p, [0, 1], [-90, 60]); break;
-    case "bajar": s = 1.1; y = interpolate(p, [0, 1], [60, -90]); break;
-    case "zoom_rapido": s = 1 + interpolate(f, [0, 8], [0, 0.28], { extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }) + p * 0.04; y = -interpolate(f, [0, 8], [0, 120], { extrapolateRight: "clamp" }); break;
-    case "temblor": s = 1.08 + p * 0.05; x = Math.sin(f * 1.7) * 9; y = Math.cos(f * 2.1) * 9; r = Math.sin(f) * 0.4; break;
-    case "acercar": default: s = 1.02 + p * 0.13; y = -p * 30; break;
+    case "fija": s = 1.03; break;
+    case "alejar": s = 1.14 - p * 0.11; break;
+    case "pan_der": s = 1.12; x = interpolate(p, [0, 1], [55, -55]); break;
+    case "pan_izq": s = 1.12; x = interpolate(p, [0, 1], [-55, 55]); break;
+    case "subir": s = 1.1; y = interpolate(p, [0, 1], [-70, 50]); break;
+    case "bajar": s = 1.1; y = interpolate(p, [0, 1], [50, -70]); break;
+    case "zoom_rapido": case "temblor": case "acercar": default: s = 1.03 + p * 0.1; y = -p * 24; break;
   }
-  // golpe de cámara al empezar cada escena (corte con energía, como en los virales)
-  s *= interpolate(golpe, [0, 1], [1.09, 1]);
-  r += interpolate(golpe, [0, 1], [tipo === "pan_izq" ? -1.2 : 1.2, 0]);
+  void golpe;
   return (
     <CamaraCtx.Provider value={{ x, y, s }}>
       <g transform={`translate(540 960) scale(${s}) rotate(${r}) translate(${-540 + x} ${-960 + y})`}>{children}</g>
@@ -210,7 +207,7 @@ export const EscenaKitView: React.FC<{ escena: EscenaKit; dur: number; reparto?:
   return (
     <svg viewBox="0 0 1080 1920" width={1080} height={1920} style={{ position: "absolute", inset: 0 }}>
       <Camara tipo={escena.camara} dur={dur}>
-        {C ? <C p={escena.p ?? {}} dur={dur} /> : <CapasView escena={{ fondo: escena.fondo ?? { tipo: "liso" }, vista: escena.vista, elementos: escena.elementos ?? [] }} dur={dur} reparto={reparto} />}
+        {C ? <C p={escena.p ?? {}} dur={dur} /> : <CapasView escena={{ fondo: escena.fondo ?? { tipo: "liso" }, vista: escena.vista, elementos: escena.elementos ?? [], luz: escena.luz, atmosfera: escena.atmosfera, primer_plano: escena.primer_plano }} dur={dur} reparto={reparto} />}
       </Camara>
       <Acabado />
     </svg>
