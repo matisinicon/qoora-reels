@@ -618,3 +618,41 @@ cualquier paso: 3 fallos → fallido (y aviso).  Otros estados finales: hecho, c
 - Activar la facturación de Google AI Studio. En la capa gratuita, la voz tiene 10 peticiones al día y el texto también tiene un límite diario.
 - No están implementadas las fases 4C y 5 de la directriz (imágenes y vídeo con IA). Necesitan Gemini Image de pago o créditos de Higgsfield.
 - Modo vídeo largo (16:9, 8–12 min, semanal): no construido.
+
+---
+
+## Actualización 27/11/2026 (tarde): sonido y «lo que se narra se ve»
+
+**Biblioteca de sonido.** Está en `viralforge/remotion/public/sfx/` y tiene 55 archivos. Salen del catálogo de Epidemic Sound mediante Higgsfield y tienen licencia para contenido.
+- Se descargan con la Action `viralforge-sfx.yml`. Recibe una lista `nombre|url` por `workflow_dispatch` y normaliza el volumen con ffmpeg:
+  - los ambientes y drones se cortan a 60 s con −26 LUFS;
+  - los efectos se cortan a 8 s como máximo con −16 LUFS.
+- Ambientes: `amb_taberna`, `amb_fuego`, `amb_bosque`, `amb_campo`, `amb_viento`, `amb_mar`, `amb_ciudad`, `amb_laboratorio`, `amb_oficina`, `amb_mercado`, `amb_espacio`, `amb_noche` y `amb_lluvia`.
+- Fondos: `drone_tension` y `drone_misterio`.
+- Efectos:
+  - transiciones y subidas: `whoosh_1-3`, `riser_corto`, `riser_largo`, `riser_misterio`, `riser_anime`;
+  - golpes: `boom`, `boom_corto`, `golpe_comico`, `bonk`;
+  - objetos y acciones: `interruptor`, `zumbido`, `brillo`, `transformacion`, `monedas`, `poof`, `flash`, `terremoto`, `cristal`, `puerta`, `pasos`, `explosion2`;
+  - reacciones: `asombro`, `grito`, `fracaso`, `latido`, `aplausos`;
+  - otros: `idea`, `pop2`;
+  - además siguen los 10 antiguos.
+
+**Eventos visuales (`src/kit/Eventos.tsx`).** Cada escena puede llevar una lista `eventos: [{ tipo, palabra, ref, x, y, props, color, texto, dur }]`.
+- Los tipos son: apagon, oscurecer, foco, destello, relampago, temblor, zoom, brillo, monedas, lluvia_objetos, humo, explosion, cambio y rotulo.
+- `preparar.mjs` busca la `palabra` dentro de lo que se narra en esa escena y la convierte en `t` (segundos desde el inicio de la escena). Así el evento ocurre justo cuando la voz dice esa palabra.
+- `apagon` con `ref` deja al personaje brillando en la oscuridad (nueva prop `brilla` en Personaje.tsx).
+- `cambio` cambia las props del personaje (expresión, brazo, ropa…) a mitad de escena.
+- Si un evento con `ref` no trae x/y, toma la posición de la cabeza del personaje.
+
+**Sonido automático (`preparar.mjs`).**
+- **Efectos (`planSonidos`):** pone un whoosh en cada corte y un golpe de entrada. Cada evento lleva su efecto (por ejemplo, el apagón suena con interruptor y zumbido). Antes de la escena marcada como `giro` o `revelacion` sube un riser y en el corte suena un boom; si no hay ninguna marcada, se usa la última escena. Si dos sonidos chocan, se queda el más importante.
+- **Ambientes (`planAmbientes`):** eligen el ambiente según el escenario (o el campo `ambiente` de la escena). Los tramos seguidos con el mismo ambiente se juntan y entran y salen con fundido.
+- **Música:** si el encargo trae `musica_url` se usa esa pista; si no, `fondo_sonoro: tension|misterio` pone el drone correspondiente. En los dos casos el volumen baja mientras habla la voz y sube en los huecos y al final.
+
+**Agentes.**
+- **FRAME:** el nuevo nodo «Añadir eventos y sonido» le pasa el catálogo de eventos y la regla de oro: lo que se narra se ve, con el evento clavado en la palabra exacta. Además marca `momento` (gancho, giro o revelación) y `fondo_sonoro`.
+- **Comprobar plan:** exige al menos una escena con evento de cada tres y filtra los tipos de evento que no existen.
+- **Guardar plan:** guarda `fondo_sonoro` en el plan; `contexto_motion` lo devuelve y MOTION lo pasa al encargo de montaje.
+- **GUARDIAN:** tiene la regla 7. Pide correcciones a FRAME si algo que se narra no se ve, y revisa que haya efectos y fondo sonoro.
+
+**Pendiente.** No hay biblioteca de música propiamente dicha: el usuario tiene que bajar pistas libres o pagar música generada.
