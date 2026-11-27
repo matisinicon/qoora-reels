@@ -581,3 +581,40 @@ cualquier paso: 3 fallos → fallido (y aviso).  Otros estados finales: hecho, c
 - **STORYLAB** pasa a las 02:20 y da prioridad a los datos vistos y oídos.
 - **SCRIPTOR:** `contexto_scriptor.referencias_top` incluye `visto_y_escuchado` (primera frase, gancho visual, estructura, ritmo, palabras por minuto, segundos por plano, revelación, cierre, sonido y transcripción).
 - **Primeros resultados:** las referencias que mejor funcionan hablan a **~190 palabras por minuto**, cambian de plano cada **2,3-3,2 s**, empiezan a hablar en el segundo 0 y usan subtítulos de 1-2 palabras en amarillo y blanco, música de fondo continua y efectos en cada acción.
+
+---
+
+## Actualización 27/11/2026 — Directriz Maestra aplicada
+
+**Cerebro y reglas**
+- Todos los agentes siguen la BIBLIA v3 (`documentos.biblia_resumen`), adaptada de `DIRECTRIZ_MAESTRA.md`. Los prompts de SCRIPTOR, FRAME, GUARDIAN y PUBLISHER están reescritos según ella.
+- VF00 usa Gemini 3.5 Flash como cerebro principal (thinking bajo, 100 s). Si falla, pasa a la cadena Cohere.
+- SCRIPTOR comprueba la historia antes de guardarla: palabras entre 0,75 y 1,3 veces el objetivo (máx. 205), al menos 5 segmentos y un dato real. El dato real se verifica con Google mediante Gemini con google_search.
+- FRAME exige que las escenas cubran la narración: unas 15 palabras por escena (6 s como máximo). Como mucho un 25 % de fondos lisos y un 40 % de escenas sin personaje. Todas las referencias de reparto deben estar definidas y la portada es obligatoria.
+- GUARDIAN revisa el vídeo contra la ficha de STORYLAB (gancho, estructura, duración entre 30 y 85 s, qué no copiar).
+- PUBLISHER genera 3 opciones de título. VF12 las muestra en Telegram junto con el retraso de cada slot (1 h, 3 h y 5 h).
+
+**Estilo visual (Remotion, `src/kit/`)**
+- `Personaje.tsx` v3 aplica la REGLA DEL CUERPO de la directriz:
+  - Monigote de cabeza ovalada dibujada a mano.
+  - La ropa va solo en el torso. Brazos, manos y piernas son líneas negras finas.
+  - La cara tiene sombra lavanda (#B4B2EA) en el lado contrario a la luz y luz de contorno cálida.
+- `Mundo.tsx` incluye 28 escenarios ilustrados con paleta según la hora (`LUZ`).
+- `Atmosfera.tsx` ofrece polvo, ascuas, luciérnagas, lluvia, nieve, partículas y rayos.
+- `Capas.tsx` añade primer plano desenfocado y parallax del fondo.
+- `Escenas.tsx` hace un único movimiento suave de cámara por escena.
+- `Portada.tsx` es una portada propia, nunca un fotograma del vídeo: fondo, protagonista grande, personaje secundario, objeto y gancho de 2 a 5 palabras en amarillo.
+- `Muestra.tsx` permite previsualizar una sola escena.
+
+**Voz**
+- La voz principal es Gemini TTS (Puck) y solo recibe la narración. Los tiempos de cada palabra se calculan con faster-whisper (`tiempos_whisper.py`).
+- El recorte de pausas queda en 0,42 s como máximo y deja 0,28 s.
+- Si Gemini falla, MOTION usa ElevenLabs.
+
+**Jornada bajo demanda**
+- VF13 JORNADA se lanza al escribir «prepárame los vídeos de hoy» o /hoy. Ejecuta scout → metrics → ojos → storylab y después arranca el motor VF10 (sin cron).
+
+**Pendiente**
+- Activar la facturación de Google AI Studio. En la capa gratuita, la voz tiene 10 peticiones al día y el texto también tiene un límite diario.
+- No están implementadas las fases 4C y 5 de la directriz (imágenes y vídeo con IA). Necesitan Gemini Image de pago o créditos de Higgsfield.
+- Modo vídeo largo (16:9, 8–12 min, semanal): no construido.
