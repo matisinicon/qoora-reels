@@ -91,6 +91,19 @@ export const Oscuridad: React.FC<{ evs: Evento[]; dur: number }> = ({ evs, dur }
           <rect x={0} y={0} width={1080} height={1920} fill={`url(#${id})`} opacity={o} />
         </g>
       );
+    } else if (ev.tipo === "apagon" && (!ev.ref || ev.ref === "todos")) {
+      // apagón general: oscuridad algo menor y TODO el lugar brilla con el color (p. ej. «brilló en todo el castillo»)
+      const c = ev.color ?? "#9CFFB0";
+      const pulso = 0.5 + Math.sin(a.lf / 5) * 0.12;
+      capas.push(
+        <g key={i}>
+          <rect x={-400} y={-400} width={1880} height={2720} fill="#04030a" opacity={o * 0.82} />
+          <rect x={-400} y={-400} width={1880} height={2720} fill={c} opacity={o * 0.2 * pulso * 2} style={{ mixBlendMode: "screen" }} />
+          {Array.from({ length: 26 }).map((_, k) => (
+            <circle key={k} cx={(k * 211) % 1080} cy={300 + ((k * 337 + a.lf * (2 + (k % 3))) % 1300)} r={6 + (k % 4) * 3} fill={c} opacity={o * (0.4 + 0.5 * Math.abs(Math.sin((a.lf + k * 9) / 7)))} />
+          ))}
+        </g>
+      );
     } else {
       capas.push(<rect key={i} x={-400} y={-400} width={1880} height={2720} fill={ev.tipo === "apagon" ? "#04030a" : "#0d0b22"} opacity={o} />);
     }
