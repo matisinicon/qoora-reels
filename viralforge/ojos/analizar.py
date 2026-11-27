@@ -37,7 +37,7 @@ def hoja(f, tiempos, cols, nombre):
     if not n: return None
     filas = (n + cols - 1) // cols
     sh("ffmpeg", "-y", "-v", "error", "-framerate", "1", "-i", os.path.join(tmp, "%03d.jpg"),
-       "-vf", f"tile={cols}x{filas}:padding=4:color=white", "-frames:v", "1", "-q:v", "4", os.path.join(out, nombre))
+       "-vf", f"tile={cols}x{filas}:padding=4:color=white", "-frames:v", "1", "-q:v", "6", os.path.join(out, nombre))
     return nombre if os.path.exists(os.path.join(out, nombre)) else None
 
 modelo = None
@@ -117,9 +117,14 @@ for v in enc.get("videos", []):
 
     r["ritmo"] = ("muy rápido" if r["seg_por_plano"] and r["seg_por_plano"] < 1.5 else
                   "rápido" if r["seg_por_plano"] and r["seg_por_plano"] < 3 else "pausado")
+    # las hojas también van dentro del JSON (base64) para que n8n se las pase directamente a la IA con visión
+    import base64
+    for k in ("hoja_gancho", "hoja_resto"):
+        if r.get(k):
+            r[k + "_b64"] = base64.b64encode(open(os.path.join(out, r[k]), "rb").read()).decode()
     r["ok"] = True
     os.remove(f)
-    print(cod, json.dumps({k: r[k] for k in r if k not in ("transcripcion", "cortes")}, ensure_ascii=False))
+    print(cod, json.dumps({k: r[k] for k in r if k not in ("transcripcion", "cortes") and not k.endswith("_b64")}, ensure_ascii=False))
     resultados.append(r)
 
 json.dump({"id": enc.get("id"), "videos": resultados}, open(os.path.join(out, "resultados.json"), "w"), ensure_ascii=False, indent=1)
