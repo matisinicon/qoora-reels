@@ -31,7 +31,6 @@ export const Historia: React.FC<HistoriaProps> = (p) => {
         </AbsoluteFill>
       ) : (
         <>
-          <CajaNarracion palabras={p.palabras} />
           <SubtituloCentral palabras={p.palabras} />
         </>
       )}

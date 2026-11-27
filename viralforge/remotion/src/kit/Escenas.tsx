@@ -1,5 +1,6 @@
 import React from "react";
-import { interpolate, useCurrentFrame, useVideoConfig, spring } from "remotion";
+import { CamaraCtx } from "./camara";
+import { interpolate, useCurrentFrame, useVideoConfig, spring, Easing } from "remotion";
 import { Cielo, Interior, Mar } from "./Escenario";
 import { Barco, Calendario, Contador, Explosion, Flecha, Submarino, Torpedo, VistaPeriscopio } from "./Objetos";
 import { Personaje } from "./Personaje";
@@ -164,20 +165,45 @@ const Escenas: Record<string, React.FC<{ p: Record<string, any>; dur: number }>>
 };
 
 // Cámara por escena: acercar, alejar, panorámica, temblor; con un pequeño «golpe» al entrar
+
 export const Camara: React.FC<{ tipo?: string; dur: number; children: React.ReactNode }> = ({ tipo = "acercar", dur, children }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const golpe = spring({ frame: f, fps, config: { damping: 14, stiffness: 220 } });
-  const p = interpolate(f, [0, dur], [0, 1], { extrapolateRight: "clamp" });
+  const p = interpolate(f, [0, dur], [0, 1], { extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
   let s = 1, x = 0, y = 0, r = 0;
-  if (tipo === "acercar") s = 1 + p * 0.12;
-  if (tipo === "alejar") s = 1.14 - p * 0.12;
-  if (tipo === "pan_der") { s = 1.08; x = interpolate(p, [0, 1], [40, -40]); }
-  if (tipo === "pan_izq") { s = 1.08; x = interpolate(p, [0, 1], [-40, 40]); }
-  if (tipo === "temblor") { s = 1.06 + p * 0.05; x = Math.sin(f * 1.7) * 7; y = Math.cos(f * 2.1) * 7; r = Math.sin(f) * 0.3; }
-  s *= interpolate(golpe, [0, 1], [1.06, 1]);
-  return <g transform={`translate(540 960) scale(${s}) rotate(${r}) translate(${-540 + x} ${-960 + y})`}>{children}</g>;
+  switch (tipo) {
+    case "fija": s = 1.02; break;
+    case "alejar": s = 1.16 - p * 0.14; break;
+    case "pan_der": s = 1.12; x = interpolate(p, [0, 1], [70, -70]); break;
+    case "pan_izq": s = 1.12; x = interpolate(p, [0, 1], [-70, 70]); break;
+    case "subir": s = 1.1; y = interpolate(p, [0, 1], [-90, 60]); break;
+    case "bajar": s = 1.1; y = interpolate(p, [0, 1], [60, -90]); break;
+    case "zoom_rapido": s = 1 + interpolate(f, [0, 8], [0, 0.28], { extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }) + p * 0.04; y = -interpolate(f, [0, 8], [0, 120], { extrapolateRight: "clamp" }); break;
+    case "temblor": s = 1.08 + p * 0.05; x = Math.sin(f * 1.7) * 9; y = Math.cos(f * 2.1) * 9; r = Math.sin(f) * 0.4; break;
+    case "acercar": default: s = 1.02 + p * 0.13; y = -p * 30; break;
+  }
+  // golpe de cámara al empezar cada escena (corte con energía, como en los virales)
+  s *= interpolate(golpe, [0, 1], [1.09, 1]);
+  r += interpolate(golpe, [0, 1], [tipo === "pan_izq" ? -1.2 : 1.2, 0]);
+  return (
+    <CamaraCtx.Provider value={{ x, y, s }}>
+      <g transform={`translate(540 960) scale(${s}) rotate(${r}) translate(${-540 + x} ${-960 + y})`}>{children}</g>
+    </CamaraCtx.Provider>
+  );
 };
+
+// Acabado de imagen: viñeta y luz suave por encima de todo (da aspecto de animación «de estudio»)
+const Acabado: React.FC = () => (
+  <g pointerEvents="none">
+    <defs>
+      <radialGradient id="vineta" cx="0.5" cy="0.45" r="0.75"><stop offset="0.55" stopColor="#000" stopOpacity={0} /><stop offset="1" stopColor="#000" stopOpacity={0.42} /></radialGradient>
+      <linearGradient id="luzalta" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFF6E0" stopOpacity={0.16} /><stop offset="0.45" stopColor="#FFF6E0" stopOpacity={0} /></linearGradient>
+    </defs>
+    <rect x={0} y={0} width={1080} height={1920} fill="url(#luzalta)" />
+    <rect x={0} y={0} width={1080} height={1920} fill="url(#vineta)" />
+  </g>
+);
 
 export const EscenaKitView: React.FC<{ escena: EscenaKit; dur: number; reparto?: Reparto }> = ({ escena, dur, reparto = {} }) => {
   const C = escena.tipo && escena.tipo !== "capas" ? Escenas[escena.tipo] : undefined;
@@ -186,6 +212,7 @@ export const EscenaKitView: React.FC<{ escena: EscenaKit; dur: number; reparto?:
       <Camara tipo={escena.camara} dur={dur}>
         {C ? <C p={escena.p ?? {}} dur={dur} /> : <CapasView escena={{ fondo: escena.fondo ?? { tipo: "liso" }, vista: escena.vista, elementos: escena.elementos ?? [] }} dur={dur} reparto={reparto} />}
       </Camara>
+      <Acabado />
     </svg>
   );
 };

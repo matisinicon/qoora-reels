@@ -3,7 +3,8 @@ import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } fr
 import { fontFamily } from "../fuente";
 import { Palabra } from "../tipos";
 
-// Palabra grande en el centro (1-2 palabras cortas), como en el formato de referencia
+// Subtítulo estilo viral: 2-3 palabras grandes, la que se está diciendo resaltada en amarillo.
+// Va en la franja baja segura (encima de la interfaz de YouTube) para no tapar caras.
 export const SubtituloCentral: React.FC<{ palabras: Palabra[] }> = ({ palabras }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -13,7 +14,7 @@ export const SubtituloCentral: React.FC<{ palabras: Palabra[] }> = ({ palabras }
     let a: Palabra[] = [];
     for (const w of palabras) {
       const cand = [...a, w];
-      if (a.length && (cand.length > 2 || cand.map((x) => x.t).join(" ").length > 12)) { g.push(a); a = [w]; } else a = cand;
+      if (a.length && (cand.length > 3 || cand.map((x) => x.t).join(" ").length > 18)) { g.push(a); a = [w]; } else a = cand;
       if (/[.!?…:,]$/.test(w.t)) { g.push(a); a = []; }
     }
     if (a.length) g.push(a);
@@ -22,14 +23,18 @@ export const SubtituloCentral: React.FC<{ palabras: Palabra[] }> = ({ palabras }
   const i = grupos.findIndex((g, k) => t >= g[0].s - 0.04 && t < (grupos[k + 1]?.[0].s ?? g[g.length - 1].e + 0.4) - 0.02);
   if (i < 0) return null;
   const g = grupos[i];
-  const pop = spring({ frame: f - Math.round(g[0].s * fps), fps, config: { damping: 11, stiffness: 240 } });
+  const pop = spring({ frame: f - Math.round(g[0].s * fps), fps, config: { damping: 12, stiffness: 260 } });
   return (
-    <AbsoluteFill style={{ justifyContent: "flex-start", alignItems: "center", paddingTop: 1230 }}>
+    <AbsoluteFill style={{ justifyContent: "flex-start", alignItems: "center", paddingTop: 1300 }}>
       <div style={{
-        fontFamily, fontWeight: 700, fontSize: 112, color: "#fff", WebkitTextStroke: "16px #000", paintOrder: "stroke fill",
-        textShadow: "0 10px 24px rgba(0,0,0,0.45)", transform: `scale(${interpolate(pop, [0, 1], [0.6, 1])})`, textAlign: "center", padding: "0 60px",
+        fontFamily, fontWeight: 700, fontSize: 96, lineHeight: 1.05, WebkitTextStroke: "14px #000", paintOrder: "stroke fill",
+        textShadow: "0 8px 0 rgba(0,0,0,0.55)", transform: `scale(${interpolate(pop, [0, 1], [0.7, 1])}) rotate(${interpolate(pop, [0, 1], [-3, 0])}deg)`,
+        textAlign: "center", padding: "0 70px", textTransform: "uppercase",
       }}>
-        {g.map((w) => w.t).join(" ")}
+        {g.map((w, k) => {
+          const activa = t >= w.s - 0.03 && t < (g[k + 1]?.s ?? w.e + 0.3);
+          return <span key={k} style={{ color: activa ? "#FFE14D" : "#FFFFFF", display: "inline-block", transform: activa ? "scale(1.08)" : "none", margin: "0 10px" }}>{w.t.replace(/[.,;:]$/, "")}</span>;
+        })}
       </div>
     </AbsoluteFill>
   );

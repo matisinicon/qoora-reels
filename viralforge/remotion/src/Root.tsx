@@ -3,6 +3,7 @@ import { CalculateMetadataFunction, Composition, staticFile } from "remotion";
 import { getAudioDurationInSeconds } from "@remotion/media-utils";
 import { Short } from "./Short";
 import { Historia, HistoriaProps } from "./Historia";
+import { Muestra, MuestraProps } from "./Muestra";
 import { COLA, FPS, ShortProps } from "./tipos";
 
 const ejemplo: ShortProps = {
@@ -28,6 +29,7 @@ const calcularHistoria: CalculateMetadataFunction<HistoriaProps> = async ({ prop
 
 export const RemotionRoot: React.FC = () => (
   <>
+  <Composition id="Muestra" component={Muestra} width={1080} height={1920} fps={FPS} durationInFrames={120} defaultProps={{ escena: { desde: 0, hasta: 4, fondo: { tipo: "campo" }, elementos: [] } } as MuestraProps} />
   <Composition
     id="Historia"
     component={Historia}

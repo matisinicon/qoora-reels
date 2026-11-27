@@ -2,9 +2,13 @@ import React from "react";
 import { useCurrentFrame } from "remotion";
 import { Cielo, Interior, Mar } from "./Escenario";
 import { TINTA, ruido } from "./estilo";
+import { ESCENARIOS } from "./Mundo";
+
+const ALIAS: Record<string, string> = { interior: "casa", habitacion: "casa", salon: "casa", pub: "taberna", bar: "taberna", estacion: "estacion_tren", tren: "via_tren", pueblo: "pueblo_medieval", medieval: "pueblo_medieval", jardin: "jardin_mansion", tulipanes: "campo_tulipanes", rio: "rio_puente", puente: "rio_puente", plaza: "mercado", montanas: "montana" };
+let contador = 0;
 
 type Momento = "dia" | "atardecer" | "noche";
-export type FondoSpec = { tipo: string; momento?: Momento; color?: string; pared?: string };
+export type FondoSpec = { tipo: string; momento?: Momento; color?: string; pared?: string; [k: string]: any };
 
 const Colinas: React.FC<{ momento: Momento; horizonte: number; tonos: string[] }> = ({ momento, horizonte, tonos }) => {
   const oscuro = momento === "noche" ? 0.45 : 1;
@@ -29,6 +33,10 @@ const Arbolito: React.FC<{ x: number; y: number; s: number; tono?: string }> = (
 export const Fondo: React.FC<{ f: FondoSpec }> = ({ f: spec }) => {
   const fr = useCurrentFrame();
   const m = (spec.momento ?? "dia") as Momento;
+  const tipo = ALIAS[spec.tipo] ?? spec.tipo;
+  const E = ESCENARIOS[tipo];
+  const id = React.useMemo(() => `f${tipo}${m}${contador++}`, [tipo, m]);
+  if (E) return <E.C m={m} id={id} p={spec as any} />;
   switch (spec.tipo) {
     case "mar":
       return <g><Cielo momento={m} /><Mar momento={m} /></g>;

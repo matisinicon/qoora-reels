@@ -26,7 +26,7 @@ jobs:
       - name: Instalar ffmpeg y fuentes
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core fonts-noto-color-emoji
 
       - name: Instalar Whisper (tiempos de la voz de Gemini)
         run: |

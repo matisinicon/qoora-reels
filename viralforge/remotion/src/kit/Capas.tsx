@@ -5,6 +5,7 @@ import { BIBLIOTECA, limpiarSvg } from "./Biblioteca";
 import { Personaje, PersonajeProps } from "./Personaje";
 import { Contador, Explosion, Flecha, VistaPeriscopio } from "./Objetos";
 import { TINTA } from "./estilo";
+import { CamaraCtx } from "./camara";
 
 // Escena genérica por capas: FRAME la describe en JSON y Remotion la dibuja.
 export type Elemento = {
@@ -96,9 +97,13 @@ const ElementoView: React.FC<{ e: Elemento; dur: number; reparto: Reparto; i: nu
 };
 
 export const CapasView: React.FC<{ escena: EscenaCapas; dur: number; reparto: Reparto }> = ({ escena, dur, reparto }) => {
+  const cam = React.useContext(CamaraCtx);
+  // Paralaje: el decorado se mueve menos que los personajes → sensación de profundidad
+  const k = 0.45;
+  const fondoT = `translate(540 960) scale(${1 / (1 + (cam.s - 1) * k)}) translate(-540 -960) translate(${-cam.x * k} ${-cam.y * k})`;
   const contenido = (
     <g>
-      <Fondo f={escena.fondo ?? { tipo: "liso" }} />
+      <g transform={fondoT}><Fondo f={escena.fondo ?? { tipo: "liso" }} /></g>
       {(escena.elementos ?? []).map((e, i) => <ElementoView key={i} e={e} dur={dur} reparto={reparto} i={i} />)}
     </g>
   );
