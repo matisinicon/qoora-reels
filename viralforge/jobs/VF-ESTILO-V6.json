@@ -1,0 +1,640 @@
+{
+ "id": "VF-ESTILO-V6",
+ "composicion": "Historia",
+ "titulo": "¿Por qué este alquimista vendió agua sucia a precio de oro?",
+ "reparto": {
+  "C1": {
+   "nombre": "el alquimista",
+   "torso": "tunica",
+   "ropa": "#5C6B3A",
+   "ropa2": "#E8DCC0",
+   "sombrero": "boina",
+   "pelo": "rizado",
+   "colorPelo": "#5B3A22",
+   "barba": true
+  },
+  "C2": {
+   "nombre": "el noble",
+   "torso": "traje",
+   "ropa": "#7A1E2C",
+   "ropa2": "#F2F2F2",
+   "sombrero": "chistera",
+   "bigote": true,
+   "cuerpo": "grueso",
+   "colorPelo": "#2A1E18"
+  }
+ },
+ "escenas": [
+  {
+   "texto": "¿Por qué este alquimista",
+   "fondo": {
+    "tipo": "pueblo_medieval",
+    "momento": "dia"
+   },
+   "camara": "acercar",
+   "elementos": [
+    {
+     "tipo": "personaje",
+     "ref": "C1",
+     "x": 360,
+     "y": 1270,
+     "escala": 1.2,
+     "entra": "izq",
+     "props": {
+      "expresion": "picaro",
+      "hablando": true,
+      "brazo": "sostiene",
+      "objeto": "🧪"
+     }
+    },
+    {
+     "tipo": "personaje",
+     "ref": "C2",
+     "x": 800,
+     "y": 1250,
+     "escala": 1.0,
+     "props": {
+      "expresion": "sorpresa",
+      "brazo": "jarras",
+      "espejo": true
+     }
+    },
+    {
+     "tipo": "objeto",
+     "nombre": "moneda",
+     "x": 560,
+     "y": 700,
+     "escala": 0.6,
+     "entra": "pop",
+     "flotar": true
+    }
+   ],
+   "luz": "izq",
+   "atmosfera": "polvo",
+   "primer_plano": {
+    "nombre": "barril",
+    "x": 90
+   },
+   "eventos": [
+    {
+     "tipo": "brillo",
+     "palabra": "oro",
+     "ref": "C1"
+    },
+    {
+     "tipo": "rotulo",
+     "palabra": "oro",
+     "texto": "¡Oro!"
+    }
+   ],
+   "momento": "gancho"
+  },
+  {
+   "texto": "En la Edad Media, un",
+   "fondo": {
+    "tipo": "mercado",
+    "momento": "dia"
+   },
+   "camara": "pan_der",
+   "elementos": [
+    {
+     "tipo": "personaje",
+     "ref": "C1",
+     "x": 250,
+     "y": 1280,
+     "escala": 1.15,
+     "a": {
+      "x": 520
+     },
+     "props": {
+      "expresion": "feliz",
+      "andar": true,
+      "brazo": "sostiene",
+      "objeto": "🧪",
+      "mira": 1
+     }
+    }
+   ],
+   "luz": "izq",
+   "atmosfera": "polvo",
+   "primer_plano": {
+    "nombre": "caja",
+    "x": 980
+   },
+   "eventos": []
+  },
+  {
+   "texto": "alquimista llenó frascos con",
+   "fondo": {
+    "tipo": "laboratorio",
+    "momento": "dia"
+   },
+   "camara": "acercar",
+   "elementos": [
+    {
+     "tipo": "personaje",
+     "ref": "C1",
+     "x": 700,
+     "y": 1290,
+     "escala": 1.2,
+     "props": {
+      "expresion": "picaro",
+      "hablando": true,
+      "brazo": "pincel",
+      "espejo": true,
+      "mira": -1
+     }
+    }
+   ],
+   "luz": "der",
+   "atmosfera": "particulas",
+   "primer_plano": {
+    "nombre": "libro",
+    "x": 90
+   },
+   "eventos": [
+    {
+     "tipo": "humo",
+     "palabra": "turbia",
+     "ref": "C1"
+    },
+    {
+     "tipo": "brillo",
+     "palabra": "elixir",
+     "ref": "C1",
+     "color": "#9CFFB0"
+    }
+   ]
+  },
+  {
+   "texto": "Un noble, con bigote",
+   "fondo": {
+    "tipo": "salon_castillo",
+    "momento": "noche"
+   },
+   "camara": "alejar",
+   "elementos": [
+    {
+     "tipo": "personaje",
+     "ref": "C2",
+     "x": 540,
+     "y": 1290,
+     "escala": 1.25,
+     "entra": "pop",
+     "props": {
+      "expresion": "feliz",
+      "hablando": true,
+      "brazo": "saludo"
+     }
+    },
+    {
+     "tipo": "objeto",
+     "nombre": "moneda",
+     "x": 300,
+     "y": 820,
+     "escala": 0.5,
+     "entra": "pop",
+     "flotar": true
+    },
+    {
+     "tipo": "objeto",
+     "nombre": "moneda",
+     "x": 800,
+     "y": 760,
+     "escala": 0.5,
+     "entra": "pop",
+     "flotar": true,
+     "en": 0.2
+    }
+   ],
+   "luz": "der",
+   "atmosfera": "ascuas",
+   "primer_plano": {
+    "nombre": "barril",
+    "x": 980
+   },
+   "eventos": [
+    {
+     "tipo": "monedas",
+     "palabra": "fortuna"
+    }
+   ]
+  },
+  {
+   "texto": "Pero aquí viene lo",
+   "fondo": {
+    "tipo": "salon_castillo",
+    "momento": "noche"
+   },
+   "camara": "acercar",
+   "elementos": [
+    {
+     "tipo": "personaje",
+     "ref": "C2",
+     "x": 540,
+     "y": 1290,
+     "escala": 1.3,
+     "props": {
+      "expresion": "sorpresa",
+      "brazo": "sostiene",
+      "objeto": "🧪"
+     }
+    }
+   ],
+   "luz": "izq",
+   "atmosfera": "ascuas",
+   "primer_plano": {
+    "nombre": "barril",
+    "x": 90
+   },
+   "eventos": [
+    {
+     "tipo": "zoom",
+     "palabra": "bueno",
+     "ref": "C2"
+    }
+   ],
+   "momento": "giro"
+  },
+  {
+   "texto": "Al beberlo, brilló en",
+   "fondo": {
+    "tipo": "salon_castillo",
+    "momento": "noche"
+   },
+   "camara": "acercar",
+   "elementos": [
+    {
+     "tipo": "personaje",
+     "ref": "C2",
+     "x": 540,
+     "y": 1290,
+     "escala": 1.3,
+     "props": {
+      "expresion": "sorpresa",
+      "brazo": "dos_arriba"
+     }
+    },
+    {
+     "tipo": "efecto",
+     "nombre": "destello",
+     "x": 540,
+     "y": 900
+    }
+   ],
+   "luz": "izq",
+   "atmosfera": "ascuas",
+   "primer_plano": {
+    "nombre": "barril",
+    "x": 980
+   },
+   "eventos": [
+    {
+     "tipo": "apagon",
+     "palabra": "brilló",
+     "ref": "C2",
+     "color": "#9CFFB0"
+    }
+   ]
+  },
+  {
+   "texto": "El alquimista, con boina",
+   "fondo": {
+    "tipo": "taberna",
+    "momento": "noche"
+   },
+   "camara": "pan_izq",
+   "elementos": [
+    {
+     "tipo": "personaje",
+     "ref": "C1",
+     "x": 330,
+     "y": 1280,
+     "escala": 1.15,
+     "props": {
+      "expresion": "risa",
+      "brazo": "jarras"
+     }
+    },
+    {
+     "tipo": "personaje",
+     "ref": "C2",
+     "x": 790,
+     "y": 1270,
+     "escala": 1.05,
+     "props": {
+      "expresion": "confuso",
+      "espejo": true,
+      "mira": -1
+     }
+    }
+   ],
+   "luz": "der",
+   "atmosfera": "ascuas",
+   "primer_plano": {
+    "nombre": "barril",
+    "x": 90
+   },
+   "eventos": [
+    {
+     "tipo": "cambio",
+     "palabra": "sonrió",
+     "ref": "C1",
+     "props": {
+      "expresion": "picaro"
+     }
+    },
+    {
+     "tipo": "cambio",
+     "palabra": "confuso",
+     "ref": "C2",
+     "props": {
+      "expresion": "confuso"
+     }
+    }
+   ]
+  },
+  {
+   "texto": "El alquimista explicó: contiene",
+   "fondo": {
+    "tipo": "laboratorio",
+    "momento": "noche"
+   },
+   "camara": "acercar",
+   "elementos": [
+    {
+     "tipo": "personaje",
+     "ref": "C1",
+     "x": 380,
+     "y": 1290,
+     "escala": 1.2,
+     "props": {
+      "expresion": "idea",
+      "hablando": true,
+      "brazo": "senala"
+     }
+    },
+    {
+     "tipo": "objeto",
+     "nombre": "bombilla",
+     "x": 800,
+     "y": 760,
+     "escala": 0.7,
+     "entra": "pop",
+     "latir": true
+    }
+   ],
+   "luz": "der",
+   "atmosfera": "particulas",
+   "primer_plano": {
+    "nombre": "libro",
+    "x": 980
+   },
+   "eventos": [
+    {
+     "tipo": "destello",
+     "palabra": "fósforo"
+    },
+    {
+     "tipo": "brillo",
+     "palabra": "brilla",
+     "ref": "C1",
+     "color": "#9CFFB0"
+    }
+   ]
+  },
+  {
+   "texto": "Y funcionó. El noble,",
+   "fondo": {
+    "tipo": "mercado",
+    "momento": "atardecer"
+   },
+   "camara": "subir",
+   "elementos": [
+    {
+     "tipo": "personaje",
+     "ref": "C2",
+     "x": 420,
+     "y": 1280,
+     "escala": 1.2,
+     "props": {
+      "expresion": "risa",
+      "brazo": "dos_arriba",
+      "hablando": true
+     }
+    },
+    {
+     "tipo": "personaje",
+     "ref": "C1",
+     "x": 820,
+     "y": 1270,
+     "escala": 1.0,
+     "props": {
+      "expresion": "feliz",
+      "brazo": "sostiene",
+      "objeto": "💰",
+      "espejo": true
+     }
+    }
+   ],
+   "luz": "izq",
+   "atmosfera": "polvo",
+   "primer_plano": {
+    "nombre": "caja",
+    "x": 90
+   },
+   "eventos": [
+    {
+     "tipo": "cambio",
+     "palabra": "impresionado",
+     "ref": "C2",
+     "props": {
+      "expresion": "sorpresa",
+      "brazo": "dos_arriba"
+     }
+    },
+    {
+     "tipo": "monedas",
+     "palabra": "compró"
+    }
+   ]
+  },
+  {
+   "texto": "El alquimista se enriqueció,",
+   "fondo": {
+    "tipo": "castillo",
+    "momento": "noche"
+   },
+   "camara": "acercar",
+   "elementos": [
+    {
+     "tipo": "efecto",
+     "nombre": "destello",
+     "x": 540,
+     "y": 800
+    },
+    {
+     "tipo": "efecto",
+     "nombre": "humo",
+     "x": 540,
+     "y": 700
+    },
+    {
+     "tipo": "personaje",
+     "ref": "C1",
+     "x": 200,
+     "y": 1300,
+     "escala": 0.95,
+     "a": {
+      "x": -150
+     },
+     "props": {
+      "expresion": "preocupado",
+      "andar": true,
+      "espejo": true
+     }
+    }
+   ],
+   "luz": "izq",
+   "atmosfera": "luciernagas",
+   "primer_plano": {
+    "nombre": "arbol",
+    "x": 980
+   },
+   "eventos": [
+    {
+     "tipo": "apagon",
+     "palabra": "brilló",
+     "ref": "todos",
+     "color": "#9CFFB0"
+    }
+   ]
+  },
+  {
+   "texto": "El noble, ahora con",
+   "fondo": {
+    "tipo": "salon_castillo",
+    "momento": "noche"
+   },
+   "camara": "acercar",
+   "elementos": [
+    {
+     "tipo": "personaje",
+     "ref": "C2",
+     "x": 540,
+     "y": 1290,
+     "escala": 1.3,
+     "props": {
+      "expresion": "enfadado",
+      "brazo": "senala",
+      "hablando": true
+     }
+    }
+   ],
+   "luz": "der",
+   "atmosfera": "ascuas",
+   "primer_plano": {
+    "nombre": "barril",
+    "x": 90
+   },
+   "eventos": [
+    {
+     "tipo": "apagon",
+     "palabra": "cara",
+     "ref": "C2",
+     "color": "#9CFFB0",
+     "dur": 1.6
+    },
+    {
+     "tipo": "cambio",
+     "palabra": "echó",
+     "ref": "C2",
+     "props": {
+      "expresion": "enfadado",
+      "brazo": "senala"
+     }
+    },
+    {
+     "tipo": "temblor",
+     "palabra": "echó"
+    }
+   ]
+  },
+  {
+   "texto": "Conclusión: el alquimista ganó",
+   "fondo": {
+    "tipo": "pueblo_medieval",
+    "momento": "atardecer"
+   },
+   "camara": "alejar",
+   "elementos": [
+    {
+     "tipo": "personaje",
+     "ref": "C1",
+     "x": 360,
+     "y": 1280,
+     "escala": 1.1,
+     "props": {
+      "expresion": "picaro",
+      "brazo": "sostiene",
+      "objeto": "💰"
+     }
+    },
+    {
+     "tipo": "personaje",
+     "ref": "C2",
+     "x": 780,
+     "y": 1270,
+     "escala": 1.05,
+     "props": {
+      "expresion": "triste",
+      "espejo": true
+     }
+    }
+   ],
+   "luz": "der",
+   "atmosfera": "polvo",
+   "primer_plano": {
+    "nombre": "barril",
+    "x": 980
+   },
+   "eventos": [
+    {
+     "tipo": "monedas",
+     "palabra": "oro"
+    },
+    {
+     "tipo": "cambio",
+     "palabra": "perdió",
+     "ref": "C2",
+     "props": {
+      "expresion": "triste"
+     }
+    }
+   ],
+   "momento": "revelacion"
+  }
+ ],
+ "voz_url": "https://hpfzgiqdgcvytqydaxoz.supabase.co/storage/v1/object/public/viralforge/muestras/alquimista_v4.wav",
+ "voz_motor": "gemini",
+ "palabras": [],
+ "narracion": "¿Por qué este alquimista vendió agua sucia a precio de oro? En la Edad Media, un alquimista llenó frascos con agua turbia y los vendió como elixir de la vida. Un noble, con bigote y chistera, pagó una fortuna. Pero aquí viene lo bueno. Al beberlo, brilló en la oscuridad. El alquimista, con boina y barba, sonrió. El noble, confuso, lo miró. El alquimista explicó: contiene fósforo, brilla sin luz. Y funcionó. El noble, impresionado, compró más. El alquimista se enriqueció, pero el fósforo se escapó y brilló en todo el castillo. El noble, ahora con la cara brillante, lo echó. Conclusión: el alquimista ganó oro, pero el noble perdió su dignidad.",
+ "portada": {
+  "fondo": {
+   "tipo": "salon_castillo",
+   "momento": "noche"
+  },
+  "protagonista": "C1",
+  "expresion": "picaro",
+  "brazo": "sostiene",
+  "objeto": "🧪",
+  "secundario": {
+   "ref": "C2",
+   "expresion": "sorpresa",
+   "brazo": "dos_arriba"
+  },
+  "luz": "izq",
+  "texto": "AGUA SUCIA, PRECIO DE ORO"
+ },
+ "fondo_sonoro": "misterio"
+}
