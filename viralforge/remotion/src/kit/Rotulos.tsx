@@ -29,11 +29,11 @@ export const SubtituloCentral: React.FC<{ palabras: Palabra[] }> = ({ palabras }
       <div style={{
         fontFamily, fontWeight: 700, fontSize: 96, lineHeight: 1.05, WebkitTextStroke: "14px #000", paintOrder: "stroke fill",
         textShadow: "0 8px 0 rgba(0,0,0,0.55)", transform: `scale(${interpolate(pop, [0, 1], [0.7, 1])}) rotate(${interpolate(pop, [0, 1], [-3, 0])}deg)`,
-        textAlign: "center", padding: "0 70px", textTransform: "uppercase",
+        textAlign: "center", padding: "0 70px", textTransform: "uppercase", display: "flex", flexWrap: "wrap", justifyContent: "center", columnGap: 28, rowGap: 4,
       }}>
         {g.map((w, k) => {
           const activa = t >= w.s - 0.03 && t < (g[k + 1]?.s ?? w.e + 0.3);
-          return <span key={k} style={{ color: activa ? "#FFE14D" : "#FFFFFF", display: "inline-block", transform: activa ? "scale(1.08)" : "none", margin: "0 10px" }}>{w.t.replace(/[.,;:]$/, "")}</span>;
+          return <span key={k} style={{ color: activa ? "#FFE14D" : "#FFFFFF", display: "inline-block", transform: activa ? "scale(1.08)" : "none" }}>{w.t.replace(/[.,;:]$/, "")}</span>;
         })}
       </div>
     </AbsoluteFill>
