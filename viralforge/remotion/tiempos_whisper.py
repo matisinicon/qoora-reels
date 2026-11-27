@@ -2,7 +2,8 @@
 Uso: python3 tiempos_whisper.py voz.mp3 "narración completa" salida.json
 Whisper transcribe con tiempos por palabra y luego se alinean con el texto de la narración, así los
 subtítulos salen con la ortografía del guion y no con la de la transcripción."""
-import difflib, json, re, sys, unicodedata
+import difflib, json, re, subprocess, sys, unicodedata
+import numpy as np
 from faster_whisper import WhisperModel
 
 audio, narracion, salida = sys.argv[1], sys.argv[2], sys.argv[3]
@@ -13,7 +14,10 @@ def norm(w):
     return re.sub(r"[^a-z0-9ñ]", "", w)
 
 modelo = WhisperModel("small", device="cpu", compute_type="int8")
-segs, _ = modelo.transcribe(audio, language="es", word_timestamps=True, vad_filter=False, beam_size=5)
+# el audio se decodifica con ffmpeg (evita depender de la versión de PyAV)
+pcm = subprocess.run(["ffmpeg", "-v", "error", "-i", audio, "-f", "s16le", "-ac", "1", "-ar", "16000", "-"], capture_output=True, check=True).stdout
+muestras = np.frombuffer(pcm, np.int16).astype(np.float32) / 32768.0
+segs, _ = modelo.transcribe(muestras, language="es", word_timestamps=True, vad_filter=False, beam_size=5)
 oidas = [(w.word.strip(), w.start, w.end) for s in segs for w in (s.words or []) if w.word.strip()]
 texto = [w for w in narracion.split() if norm(w)]
 if not texto:
