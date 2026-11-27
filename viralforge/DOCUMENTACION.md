@@ -656,3 +656,8 @@ cualquier paso: 3 fallos → fallido (y aviso).  Otros estados finales: hecho, c
 - **GUARDIAN:** tiene la regla 7. Pide correcciones a FRAME si algo que se narra no se ve, y revisa que haya efectos y fondo sonoro.
 
 **Pendiente.** No hay biblioteca de música propiamente dicha: el usuario tiene que bajar pistas libres o pagar música generada.
+
+### Cambio a ElevenLabs (27/11/2026, 15:30)
+- **Voz:** `configuracion.motor_voz` pasa a `elevenlabs` y `elevenlabs_velocidad` a 1.0 (antes 1.12, demasiado rápido). Gemini TTS queda solo como opción si se vuelve a poner `motor_voz = gemini`.
+- **Música:** en MOTION se añaden «Encargo de música» → «Generar música (ElevenLabs)» (`POST /v1/music`, modelo `music_v2`, instrumental, del largo de la voz más 3 s, tono según `fondo_sonoro` y la ficha, límite de 90 s) → «Subir música a Storage» (`{codigo}/musica.mp3`). Si la generación falla, el vídeo sale con el fondo sonoro de la biblioteca. Se controla con `configuracion.musica_motor` y `elevenlabs_modelo_musica`.
+- **Efectos de sonido:** siguen siendo los de la biblioteca de Epidemic Sound (`public/sfx`).
