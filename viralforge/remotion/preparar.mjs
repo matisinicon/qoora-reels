@@ -23,7 +23,7 @@ const norm = (w) => String(w).toLowerCase().normalize("NFD").replace(/[\u0300-\u
 let palabras = (job.palabras || []).map((w) => (Array.isArray(w) ? { t: String(w[0]), s: +w[1], e: +w[2] } : { t: String(w.texto), s: +w.inicio, e: +w.fin }));
 
 // ── Ritmo: quita las pausas largas de la voz y recoloca los tiempos de cada palabra ──
-function quitarPausas(origen, destino, pal, maxPausa = 0.32, deja = 0.22) {
+function quitarPausas(origen, destino, pal, maxPausa = 0.42, deja = 0.28) {
   if (!pal.length) { fs.copyFileSync(origen, destino); return pal; }
   const tramos = []; // [inicio, fin] del audio original que se conserva
   let ini = Math.max(pal[0].s - 0.04, 0);
@@ -100,7 +100,7 @@ if (job.composicion === "Historia") {
     palabras = JSON.parse(fs.readFileSync(salida, "utf8")).map((w) => ({ t: String(w[0]), s: +w[1], e: +w[2] }));
     if (!palabras.length) throw new Error("Whisper no encontró palabras en la voz");
   }
-  palabras = job.sin_recorte_pausas ? palabras : quitarPausas(path.join(dir, "voz_original.mp3"), path.join(dir, "voz.mp3"), palabras, job.pausa_max ?? 0.32);
+  palabras = job.sin_recorte_pausas ? palabras : quitarPausas(path.join(dir, "voz_original.mp3"), path.join(dir, "voz.mp3"), palabras, job.pausa_max ?? 0.42);
   if (job.sin_recorte_pausas) fs.copyFileSync(path.join(dir, "voz_original.mp3"), path.join(dir, "voz.mp3"));
   // Cada escena trae el fragmento de narración donde empieza: se busca en orden en las palabras de la voz
   const pal = palabras.map((w) => norm(w.t));
