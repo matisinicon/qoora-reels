@@ -140,6 +140,15 @@ function planAmbientes(escenas) {
 const normP = (w) => norm(w || "");
 
 if (job.composicion === "Historia") {
+  // Efectos a medida generados con ElevenLabs para esta historia → a la biblioteca del montaje
+  for (const x of job.sfx_extra || []) {
+    try {
+      const r = await fetch(x.url);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      fs.writeFileSync(path.resolve("public/sfx", `${x.nombre}.mp3`), Buffer.from(await r.arrayBuffer()));
+      console.log(`Efecto a medida ${x.nombre} descargado`);
+    } catch (e) { console.log(`Efecto a medida ${x.nombre} no disponible (${e.message}); se usa el estándar`); }
+  }
   // La voz puede venir en mp3 (ElevenLabs) o wav (Gemini): siempre se pasa a mp3
   const ext = (String(job.voz_url).split("?")[0].match(/\.(\w+)$/) || [, "mp3"])[1].toLowerCase();
   await bajar(job.voz_url, `voz_descargada.${ext}`);

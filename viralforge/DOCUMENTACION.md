@@ -661,3 +661,7 @@ cualquier paso: 3 fallos → fallido (y aviso).  Otros estados finales: hecho, c
 - **Voz:** `configuracion.motor_voz` pasa a `elevenlabs` y `elevenlabs_velocidad` a 1.0 (antes 1.12, demasiado rápido). Gemini TTS queda solo como opción si se vuelve a poner `motor_voz = gemini`.
 - **Música:** en MOTION se añaden «Encargo de música» → «Generar música (ElevenLabs)» (`POST /v1/music`, modelo `music_v2`, instrumental, del largo de la voz más 3 s, tono según `fondo_sonoro` y la ficha, límite de 90 s) → «Subir música a Storage» (`{codigo}/musica.mp3`). Si la generación falla, el vídeo sale con el fondo sonoro de la biblioteca. Se controla con `configuracion.musica_motor` y `elevenlabs_modelo_musica`.
 - **Efectos de sonido:** siguen siendo los de la biblioteca de Epidemic Sound (`public/sfx`).
+- **Efectos a medida (ElevenLabs):** FRAME puede pedir hasta 3 `sonido_ia` por vídeo (una descripción en inglés, en un evento o en una escena) para sonidos muy concretos de la historia.
+  - MOTION los genera: «Efectos a medida» → «Generar efecto (ElevenLabs)» con `POST /v1/sound-generation` (3 s) → «Subir efecto a Storage», que los guarda como `{codigo}/ia_N.mp3`.
+  - Después los manda en `sfx_extra`. `preparar.mjs` los descarga en `public/sfx` y ocupan el lugar del efecto estándar.
+  - Si alguno falla, suena el efecto de la biblioteca. Los sonidos comunes siguen saliendo de la biblioteca de Epidemic.
