@@ -25,10 +25,10 @@ jobs:
             curl -sSfL -o "/tmp/crudo/$nombre.mp3" "$url"
             if [[ "$nombre" == amb_* || "$nombre" == drone_* ]]; then
               # ambientes: 60 s, bucle limpio, volumen bajo de base
-              ffmpeg -y -loglevel error -i "/tmp/crudo/$nombre.mp3" -t 60 -af "loudnorm=I=-26:TP=-3,afade=t=in:d=1,afade=t=out:st=58:d=2" -ac 1 -b:a 96k "$D/$nombre.mp3"
+              ffmpeg -nostdin -y -loglevel error -i "/tmp/crudo/$nombre.mp3" -t 60 -af "loudnorm=I=-26:TP=-3,afade=t=in:d=1,afade=t=out:st=58:d=2" -ac 1 -b:a 96k "$D/$nombre.mp3"
             else
               # efectos: quita silencio inicial, máx 8 s
-              ffmpeg -y -loglevel error -i "/tmp/crudo/$nombre.mp3" -af "silenceremove=start_periods=1:start_threshold=-50dB,atrim=0:8,loudnorm=I=-16:TP=-1.5,afade=t=out:st=7.6:d=0.4" -ac 1 -b:a 128k "$D/$nombre.mp3"
+              ffmpeg -nostdin -y -loglevel error -i "/tmp/crudo/$nombre.mp3" -af "silenceremove=start_periods=1:start_threshold=-50dB,atrim=0:8,loudnorm=I=-16:TP=-1.5,afade=t=out:st=7.6:d=0.4" -ac 1 -b:a 128k "$D/$nombre.mp3"
             fi
             echo "$nombre $(ffprobe -v error -show_entries format=duration -of csv=p=0 $D/$nombre.mp3)s"
           done
