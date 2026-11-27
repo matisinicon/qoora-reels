@@ -3,7 +3,7 @@
  * Cada escena recibe su bloque del guion y el reloj de palabras (`T.at("palabra")`).
  */
 import React from "react";
-import { AbsoluteFill, interpolate, Sequence } from "remotion";
+import { AbsoluteFill, Img, interpolate, OffthreadVideo, Sequence, staticFile } from "remotion";
 import { EASE, FONT } from "../qoora/brand";
 import { BrandScene, Sfx, Subtitles } from "../qoora/components";
 import { at, Core, D, DarkBackground, Defs, DrawEdge, DSignature, DTitle, edge, EntryLine, Label, Module, p, Packet, Pt, Pulse, ring, Rings, towards, useT } from "../presentacion/kit";
@@ -493,13 +493,198 @@ export const CtaDark: React.FC<S<"cta_dark">> = ({ T, s }) => {
             scale: String(interpolate(t, [tCta, tCta + 0.35], [0, 1], { ...clamp, easing: EASE.back })),
           }}
         >
-          Comenta AGENTE
+          {s.ctaText ?? "Comenta AGENTE"}
         </div>
       </div>
       <Subtitles phrases={T.phrases} y={SUB_Y} dark />
       <Sfx name="WHOOSH" at={0} />
       <Sfx name="BOOM" at={0.1} />
       <Sfx name="IMPACT" at={tCta} />
+    </BrandScene>
+  );
+};
+
+/* ---------------------------------------------------------------- móvil con un vídeo real */
+export const PhoneClip: React.FC<S<"phone_clip">> = ({ T, s }) => {
+  const t = useT();
+  const k = p(t, 0.05, 0.6, EASE.back);
+  const W = 470, H = 836, x = 540 - W / 2, y = 400;
+  return (
+    <BrandScene camera={{ preset: "QOORA_PUSH_IN_01", focus: [540, 820] }} bg={D.bg} background={<DarkBackground glow={{ x: 540, y: 820 }} glowA={0.2} />}>
+      <DSignature />
+      <DTitle text={s.title} accent={s.accent} y={215} size={68} />
+      <div
+        style={{
+          position: "absolute", left: x, top: y, width: W, height: H, borderRadius: 64, overflow: "hidden",
+          border: "10px solid #1c1c1c", boxShadow: `0 0 0 2px #333, 0 30px 90px rgba(255,133,0,${0.25 * k})`,
+          transform: `perspective(1600px) rotateY(${interpolate(t, [0, T.dur], [-10, 6])}deg) rotateZ(${interpolate(t, [0, T.dur], [-3, 1])}deg) scale(${0.7 + 0.3 * k})`,
+          opacity: p(t, 0, 0.3),
+        }}
+      >
+        <OffthreadVideo src={staticFile(s.clip)} muted style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        <div style={{ position: "absolute", top: 18, left: "50%", width: 120, height: 30, marginLeft: -60, borderRadius: 20, background: "#000" }} />
+      </div>
+      {s.tag && (
+        <div style={{ position: "absolute", top: y + H - 40, left: 0, right: 0, display: "flex", justifyContent: "center", opacity: p(t, 0.5, 0.3) }}>
+          <div style={{ background: D.orange, color: "#050505", fontFamily: FONT.body, fontWeight: 700, fontSize: 26, letterSpacing: 3, padding: "12px 26px", borderRadius: 40 }}>{s.tag}</div>
+        </div>
+      )}
+      <Subtitles phrases={T.phrases} y={SUB_Y} dark />
+      <Sfx name="OPEN" at={0} />
+      <Sfx name="WHOOSH" at={0.05} />
+    </BrandScene>
+  );
+};
+
+/* ---------------------------------------------------------------- circuito de agentes + ventana de lo que hacen */
+const Ventana: React.FC<{ kind: string; since: number; clip?: string; images?: string[]; sheet?: string; label: string }> = ({ kind, since, clip, images = [], sheet, label }) => {
+  const t = useT();
+  const lt = t - since;
+  const k = p(t, since, 0.3, EASE.back);
+  const box: React.CSSProperties = { position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 14 };
+  const txt: React.CSSProperties = { fontFamily: FONT.body, fontWeight: 700, color: "#fff" };
+  let body: React.ReactNode = null;
+  if (kind === "thumbs")
+    body = (
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, padding: 20 }}>
+        {images.slice(0, 4).map((im, i) => (
+          <div key={i} style={{ position: "relative", opacity: p(t, since + i * 0.12, 0.25), transform: `scale(${0.8 + 0.2 * p(t, since + i * 0.12, 0.3, EASE.back)})` }}>
+            <Img src={staticFile(im)} style={{ width: 150, height: 150, objectFit: "cover", borderRadius: 14, border: `3px solid ${i === 0 ? D.orange : "#333"}` }} />
+            <div style={{ position: "absolute", bottom: 6, left: 6, background: "#000c", color: D.orange2, fontFamily: FONT.body, fontWeight: 700, fontSize: 18, padding: "2px 8px", borderRadius: 8 }}>{["4,2M", "1,8M", "960K", "730K"][i]}</div>
+          </div>
+        ))}
+      </div>
+    );
+  else if (kind === "chart")
+    body = (
+      <svg width={300} height={260}>
+        {[0.35, 0.55, 0.3, 0.95, 0.5].map((v, i) => {
+          const h = 220 * v * p(t, since + i * 0.08, 0.5);
+          return <rect key={i} x={10 + i * 58} y={240 - h} width={42} height={h} rx={8} fill={v > 0.9 ? D.orange : "#3a3a3a"} />;
+        })}
+        <text x={243} y={30} textAnchor="middle" fontFamily={FONT.body} fontWeight={700} fontSize={26} fill={D.orange2} opacity={p(t, since + 0.6, 0.3)}>×10</text>
+      </svg>
+    );
+  else if (kind === "ficha")
+    body = ["GANCHO", "GIRO", "RITMO", "CIERRE"].map((w, i) => (
+      <div key={w} style={{ ...txt, fontSize: 30, letterSpacing: 4, width: 270, padding: "10px 18px", borderRadius: 12, border: `2px solid ${D.orange}`, background: "#1a1006", opacity: p(t, since + i * 0.15, 0.25), transform: `translateX(${(1 - p(t, since + i * 0.15, 0.3)) * 40}px)` }}>
+        <span style={{ color: D.orange2 }}>✓ </span>{w}
+      </div>
+    ));
+  else if (kind === "guion") {
+    const linea = "L1  Un alquimista vendió agua sucia a precio de oro…";
+    const n = Math.max(0, Math.floor((lt - 0.1) * 26));
+    body = (
+      <div style={{ ...txt, fontSize: 30, lineHeight: 1.35, width: 300, textAlign: "left", fontWeight: 500 }}>
+        {linea.slice(0, n)}
+        <span style={{ color: D.orange, opacity: Math.floor(lt * 3) % 2 ? 1 : 0 }}>▌</span>
+      </div>
+    );
+  } else if (kind === "hoja" && sheet)
+    body = <Img src={staticFile(sheet)} style={{ width: 340, height: 340, objectFit: "cover", borderRadius: 16, transform: `scale(${1.15 - 0.15 * p(t, since, 1.2)})` }} />;
+  else if (kind === "video" && clip)
+    body = (
+      <Sequence from={Math.max(0, Math.round(since * 30))} layout="none">
+        <OffthreadVideo src={staticFile(clip)} muted style={{ width: 210, height: 373, objectFit: "cover", borderRadius: 18, border: "3px solid #333" }} />
+      </Sequence>
+    );
+  else if (kind === "check")
+    body = (
+      <>
+        <div style={{ width: 170, height: 170, borderRadius: 100, border: `8px solid ${D.ok}`, display: "flex", alignItems: "center", justifyContent: "center", ...txt, fontSize: 110, color: D.ok, transform: `scale(${p(t, since, 0.4, EASE.back)})` }}>✓</div>
+        <div style={{ ...txt, fontSize: 30, letterSpacing: 6, color: D.ok, opacity: p(t, since + 0.3, 0.3) }}>APROBADO</div>
+      </>
+    );
+  else if (kind === "calendario")
+    body = ["+1 h", "+3 h", "+5 h"].map((h, i) => (
+      <div key={h} style={{ display: "flex", alignItems: "center", gap: 16, width: 310, padding: "12px 16px", borderRadius: 14, background: "#151515", border: "2px solid #333", opacity: p(t, since + i * 0.18, 0.25) }}>
+        <div style={{ width: 54, height: 38, borderRadius: 10, background: "#FF0033", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 22 }}>▶</div>
+        <div style={{ ...txt, fontSize: 28, whiteSpace: "nowrap" }}>Vídeo {i + 1}</div>
+        <div style={{ ...txt, fontSize: 28, color: D.orange2, marginLeft: "auto", whiteSpace: "nowrap" }}>{h}</div>
+      </div>
+    ));
+  else if (kind === "loop")
+    body = (
+      <>
+        <div style={{ ...txt, fontSize: 150, color: D.orange, transform: `rotate(${lt * 120}deg)` }}>↻</div>
+        <div style={{ ...txt, fontSize: 30, letterSpacing: 6 }}>APRENDE</div>
+      </>
+    );
+  return (
+    <div style={{ ...box, opacity: Math.min(1, k * 1.2), transform: `scale(${0.85 + 0.15 * k})` }}>
+      {body}
+      <div style={{ position: "absolute", bottom: 14, ...txt, fontSize: 20, letterSpacing: 4, color: D.orange2 }}>{label}</div>
+    </div>
+  );
+};
+
+export const AgentChain: React.FC<S<"agent_chain">> = ({ T, s }) => {
+  const t = useT();
+  const c: Pt = { x: 540, y: 770 };
+  const n = s.agents.length;
+  const pts = ring(n, c.x, c.y, 395, 410, -90);
+  const at_ = s.agents.map((a, i) => T.at(a.word, 0.4 + i * 1.6));
+  const tCon = s.connect ? T.at(s.connect.word, 99) : 99;
+  const tLoop = s.loop ? T.at(s.loop.word, 99) : 99;
+  const tLearn = s.learn ? T.at(s.learn.word, 99) : 99;
+  // índice del agente activo
+  let act = -1;
+  at_.forEach((x, i) => { if (t >= x - 0.05) act = i; });
+  const peers = pts.map((m, i) => edge(m, pts[(i + 1) % n], -0.16));
+  // títulos: uno por agente y luego los del bucle
+  const titles = [
+    ...s.agents.map((a, i) => ({ text: a.title, accent: a.accent, from: at_[i] })),
+    ...(s.connect ? [{ text: s.connect.title, accent: s.connect.accent, from: tCon }] : []),
+    ...(s.loop ? [{ text: s.loop.title, accent: s.loop.accent, from: tLoop }] : []),
+    ...(s.learn ? [{ text: s.learn.title, accent: s.learn.accent, from: tLearn }] : []),
+  ].filter((x) => x.from < 99);
+  let ti = -1;
+  titles.forEach((x, i) => { if (t >= x.from - 0.05) ti = i; });
+  const kind = t >= tLearn - 0.05 ? "loop" : act >= 0 ? s.agents[act].preview : "";
+  const since = t >= tLearn - 0.05 ? tLearn : act >= 0 ? at_[act] : 0;
+  const label = t >= tLearn - 0.05 ? "BUCLE" : act >= 0 ? s.agents[act].label : "";
+  const W = 380;
+  return (
+    <BrandScene camera={{ preset: "QOORA_SLOW_ZOOM_01", focus: [540, 770] }} bg={D.bg} background={<DarkBackground glow={c} glowA={0.12 + (t >= tCon ? 0.08 : 0)} />} shakeAt={tCon < 99 ? [tCon] : []}>
+      <DSignature />
+      {ti >= 0 && (
+        <Late key={ti} at={titles[ti].from}>
+          <DTitle text={titles[ti].text} accent={titles[ti].accent} y={175} size={62} />
+        </Late>
+      )}
+      <Svg>
+        <Rings c={c} radii={[230, 300]} start={0} />
+        {peers.map((e, i) => {
+          const done = i < n - 1 ? t >= at_[i + 1] - 0.3 : t >= tLoop - 0.2;
+          const k = i < n - 1 ? p(t, at_[i + 1] - 0.35, 0.35, EASE.inOut) : p(t, tLoop - 0.2, 0.6, EASE.inOut);
+          return (
+            <g key={i}>
+              <DrawEdge e={e} k={k} hot={done} opacity={i === n - 1 ? 1 : 0.85} width={i === n - 1 ? 5 : 3} />
+              {t >= tCon && <Packet e={e} start={tCon + i * 0.12} period={1.2} travel={0.9} r={6} />}
+            </g>
+          );
+        })}
+        {pts.map((m, i) => (
+          <g key={s.agents[i].label}>
+            <Module c={m} label={s.agents[i].label} start={0.1 + i * 0.05} active={at_[i]} w={Math.max(170, s.agents[i].label.length * 19 + 60)} />
+            <Pulse c={m} start={at_[i]} r0={40} r1={120} />
+          </g>
+        ))}
+        {tCon < 99 && <Pulse c={c} start={tCon} r0={200} r1={560} dur={1.1} />}
+        {tLearn < 99 && <Pulse c={c} start={tLearn} r0={120} r1={420} dur={0.9} />}
+      </Svg>
+      <div style={{ position: "absolute", left: c.x - W / 2, top: c.y - W / 2, width: W, height: W, borderRadius: 34, background: "#0b0b0b", border: `2px solid ${act >= 0 ? D.orange : "#2a2a2a"}`, boxShadow: `0 0 60px rgba(255,133,0,${act >= 0 ? 0.25 : 0})`, overflow: "hidden" }}>
+        {kind && <Ventana key={kind + since} kind={kind} since={since} clip={s.clip} images={s.images} sheet={s.sheet} label={label} />}
+      </div>
+      <Subtitles phrases={T.phrases} y={SUB_Y} dark />
+      <Sfx name="WHOOSH" at={0} />
+      {at_.map((x, i) => (
+        <Sfx key={i} name={i === n - 1 ? "REWARD" : "POP"} at={x} />
+      ))}
+      {s.agents.map((a, i) => (a.preview === "guion" ? <Sfx key={"ty" + i} name="TYPE" at={at_[i] + 0.1} /> : a.preview === "check" ? <Sfx key={"ck" + i} name="DING" at={at_[i] + 0.1} /> : null))}
+      {tCon < 99 && <Sfx name="BOOM" at={tCon} />}
+      {tLoop < 99 && <Sfx name="RISER" at={Math.max(0, tLoop - 0.6)} />}
+      {tLearn < 99 && <Sfx name="REVEAL" at={tLearn} />}
     </BrandScene>
   );
 };

@@ -39,7 +39,32 @@ export const sceneSchema = z.discriminatedUnion("type", [
   z.object({ ...base, type: z.literal("pipeline"), title: z.string(), accent: z.string().optional(), from: z.string(), to: z.string(), steps: z.array(z.string()).length(4), word: z.string() }),
   z.object({ ...base, type: z.literal("approval"), title: z.string(), accent: z.string().optional(), proposal: z.string(), proposeWord: z.string(), approveWord: z.string(), result: z.string() }),
   z.object({ ...base, type: z.literal("manifesto"), line1: z.string(), line2: z.string(), accent: z.string().optional(), en: z.string().optional(), word: z.string() }),
-  z.object({ ...base, type: z.literal("cta_dark"), question: z.string(), accent: z.string().optional(), ctaWord: z.string() }),
+  z.object({ ...base, type: z.literal("cta_dark"), question: z.string(), accent: z.string().optional(), ctaWord: z.string(), ctaText: z.string().optional() }),
+  // móvil que reproduce un vídeo real (p. ej. un Short de VIRALFORGE)
+  z.object({ ...base, type: z.literal("phone_clip"), title: z.string(), accent: z.string().optional(), clip: z.string(), tag: z.string().optional() }),
+  // circuito de agentes alrededor de una ventana que muestra lo que produce cada uno
+  z.object({
+    ...base,
+    type: z.literal("agent_chain"),
+    agents: z
+      .array(
+        z.object({
+          label: z.string(),
+          word: z.string(),
+          title: z.string(),
+          accent: z.string().optional(),
+          preview: z.enum(["thumbs", "chart", "ficha", "guion", "hoja", "video", "check", "calendario"]),
+        })
+      )
+      .min(3)
+      .max(8),
+    connect: z.object({ word: z.string(), title: z.string(), accent: z.string().optional() }).optional(),
+    loop: z.object({ word: z.string(), title: z.string(), accent: z.string().optional() }).optional(),
+    learn: z.object({ word: z.string(), title: z.string(), accent: z.string().optional() }).optional(),
+    clip: z.string().optional(),
+    images: z.array(z.string()).optional(),
+    sheet: z.string().optional(),
+  }),
   // ---------- línea de casos (crema) ----------
   z.object({ ...base, type: z.literal("hook_chat"), pre: z.string(), slam: z.string(), business: z.string(), time: z.string(), message: z.string(), stamp: z.string(), stampWord: z.string() }),
   z.object({ ...base, type: z.literal("chips"), title: z.string(), accent: z.string().optional(), chips: z.array(z.object({ text: z.string(), tone: z.enum(["bad", "warn", "neutral", "ok"]), word: z.string() })).min(3).max(5) }),

@@ -23,6 +23,8 @@ const render = (T: Timed, sig: { name: string; tagline: string }) => {
     case "approval": return <Dk.Approval T={T} s={s} />;
     case "manifesto": return <Dk.Manifesto T={T} s={s} />;
     case "cta_dark": return <Dk.CtaDark T={T} s={s} />;
+    case "phone_clip": return <Dk.PhoneClip T={T} s={s} />;
+    case "agent_chain": return <Dk.AgentChain T={T} s={s} />;
     case "hook_chat": return <Cr.HookChat T={T} s={s} sig={sig} />;
     case "chips": return <Cr.Chips T={T} s={s} sig={sig} />;
     case "mascot_reveal": return <Cr.MascotReveal T={T} s={s} sig={sig} />;
