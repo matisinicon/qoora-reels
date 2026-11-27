@@ -1,0 +1,25 @@
+name: VIRALFORGE · Miniaturas y fotogramas de referencia
+on:
+  push:
+    branches: [main]
+    paths: ["viralforge/referencias/lista.txt"]
+permissions:
+  contents: write
+jobs:
+  bajar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descargar miniaturas de YouTube
+        run: |
+          cd viralforge/referencias
+          while read -r v; do
+            [ -z "$v" ] && continue
+            for t in oardefault hq720 hqdefault; do curl -sfL -o "${v}_${t}.jpg" "https://i.ytimg.com/vi/$v/$t.jpg" || rm -f "${v}_${t}.jpg"; done
+            for k in 1 2 3; do curl -sfL -o "${v}_f$k.jpg" "https://i.ytimg.com/vi/$v/hq$k.jpg" || rm -f "${v}_f$k.jpg"; done
+          done < lista.txt
+          ls -la
+      - name: Guardar
+        run: |
+          git config user.name "viralforge-bot"; git config user.email "bot@users.noreply.github.com"
+          git add viralforge/referencias/*.jpg && git commit -m "VIRALFORGE: miniaturas de referencia" && git push || true
