@@ -7,6 +7,7 @@ import { Contador, Explosion, Flecha, VistaPeriscopio } from "./Objetos";
 import { TINTA } from "./estilo";
 import { CamaraCtx } from "./camara";
 import { Atmosfera } from "./Atmosfera";
+import { Evento, EfectosEvento, Oscuridad, estadoPersonaje, transformacionEventos, CABEZA_Y } from "./Eventos";
 
 // Escena genérica por capas: FRAME la describe en JSON y Remotion la dibuja.
 export type Elemento = {
@@ -25,15 +26,18 @@ export type Elemento = {
   desde?: number; hasta_valor?: number; sufijo?: string; etiqueta?: string; angulo?: number;
   props?: Record<string, any>; // parámetros del objeto o del personaje (expresion, brazo, hablando…)
 };
-export type EscenaCapas = { fondo: FondoSpec; vista?: "normal" | "periscopio"; elementos: Elemento[]; luz?: "izq" | "der"; atmosfera?: string; primer_plano?: { nombre?: string; svg?: string; x?: number } };
+export type EscenaCapas = { fondo: FondoSpec; vista?: "normal" | "periscopio"; elementos: Elemento[]; luz?: "izq" | "der"; atmosfera?: string; primer_plano?: { nombre?: string; svg?: string; x?: number }; eventos?: Evento[] };
 export type Reparto = Record<string, Partial<PersonajeProps>>;
 
-const ElementoView: React.FC<{ e: Elemento; dur: number; reparto: Reparto; i: number; luz?: "izq" | "der" }> = ({ e, dur, reparto, i, luz }) => {
+const ElementoView: React.FC<{ e: Elemento; dur: number; reparto: Reparto; i: number; luz?: "izq" | "der"; evs?: Evento[]; capa?: "normal" | "brillo" }> = ({ e, dur, reparto, i, luz, evs = [], capa = "normal" }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t0 = Math.round((e.en ?? 0) * dur);
   const t1 = e.hasta != null ? Math.round(e.hasta * dur) : dur + 1;
   if (f < t0 || f > t1) return null;
+  const est = e.tipo === "personaje" ? estadoPersonaje(e.ref, evs, f, fps, dur) : { props: {}, brilla: null };
+  if (capa === "brillo" && !est.brilla) return null;
+  if (capa === "normal" && est.brilla) return null;
   const lf = f - t0;
   const sp = spring({ frame: lf, fps, config: { damping: 12, stiffness: 170 } });
   const prog = interpolate(f, [t0, Math.max(t1 === dur + 1 ? dur : t1, t0 + 1)], [0, 1], { extrapolateRight: "clamp", easing: Easing.inOut(Easing.quad) });
@@ -59,7 +63,7 @@ const ElementoView: React.FC<{ e: Elemento; dur: number; reparto: Reparto; i: nu
 
   if (e.tipo === "personaje") {
     const base = reparto[e.ref ?? ""] ?? {};
-    const pp = { luz, ...base, ...(e.props ?? {}) } as PersonajeProps;
+    const pp = { luz, ...base, ...(e.props ?? {}), ...est.props, ...(est.brilla ? { brilla: est.brilla } : {}) } as PersonajeProps;
     return (
       <g opacity={o} transform={`translate(${x} ${y}) rotate(${r})`}>
         <Personaje {...pp} x={0} y={0} escala={s} semilla={i} />
@@ -102,12 +106,26 @@ export const CapasView: React.FC<{ escena: EscenaCapas; dur: number; reparto: Re
   // Paralaje: el decorado se mueve menos que los personajes → sensación de profundidad
   const k = 0.45;
   const fondoT = `translate(540 960) scale(${1 / (1 + (cam.s - 1) * k)}) translate(-540 -960) translate(${-cam.x * k} ${-cam.y * k})`;
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const elementos = escena.elementos ?? [];
+  // Los eventos ligados a un personaje toman su posición (cabeza) si FRAME no la da
+  const evs: Evento[] = (escena.eventos ?? []).map((ev) => {
+    if (!ev.ref || ev.ref === "todos" || (ev.x != null && ev.y != null)) return ev;
+    const el = elementos.find((e) => e.tipo === "personaje" && e.ref === ev.ref);
+    if (!el) return ev;
+    return { ...ev, x: ev.x ?? el.x ?? 540, y: ev.y ?? (el.y ?? 1200) - CABEZA_Y * (el.escala ?? 1) };
+  });
+  const ev = transformacionEventos(evs, f, fps, dur);
   const contenido = (
-    <g>
+    <g transform={`translate(${ev.tx} ${ev.ty}) translate(${ev.cx} ${ev.cy}) scale(${ev.s}) translate(${-ev.cx} ${-ev.cy})`}>
       <g transform={fondoT}><Fondo f={escena.fondo ?? { tipo: "liso" }} /></g>
-      {(escena.elementos ?? []).map((e, i) => <ElementoView key={i} e={e} dur={dur} reparto={reparto} i={i} luz={escena.luz ?? "izq"} />)}
+      {elementos.map((e, i) => <ElementoView key={i} e={e} dur={dur} reparto={reparto} i={i} luz={escena.luz ?? "izq"} evs={evs} />)}
       <Atmosfera tipo={escena.atmosfera ?? "particulas"} luz={escena.luz ?? "izq"} />
       {escena.primer_plano ? <PrimerPlano p={escena.primer_plano} /> : null}
+      <Oscuridad evs={evs} dur={dur} />
+      {elementos.map((e, i) => <ElementoView key={"b" + i} e={e} dur={dur} reparto={reparto} i={i} luz={escena.luz ?? "izq"} evs={evs} capa="brillo" />)}
+      <EfectosEvento evs={evs} dur={dur} />
     </g>
   );
   if (escena.vista === "periscopio") {

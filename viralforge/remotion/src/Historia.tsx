@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Audio, Sequence, staticFile, useVideoConfig } from "remotion";
+import { AbsoluteFill, Audio, Sequence, staticFile, useVideoConfig, interpolate } from "remotion";
 import { EscenaKit, EscenaKitView } from "./kit/Escenas";
 import { SubtituloCentral, CajaNarracion } from "./kit/Rotulos";
 import "./fuente";
@@ -7,7 +7,8 @@ import { Palabra } from "./tipos";
 import { Reparto } from "./kit/Capas";
 
 export type Sonido = { t: number; nombre: string; vol: number };
-export type HistoriaProps = { id: string; voz: string; sonidos?: Sonido[]; volumenEfectos?: number; musica: string | null; volumenMusica: number; palabras: Palabra[]; escenas: EscenaKit[]; titulo?: string; reparto?: Reparto; portada?: boolean };
+export type Ambiente = { nombre: string; desde: number; hasta: number; vol: number };
+export type HistoriaProps = { id: string; voz: string; sonidos?: Sonido[]; ambientes?: Ambiente[]; volumenEfectos?: number; musica: string | null; volumenMusica: number; palabras: Palabra[]; escenas: EscenaKit[]; titulo?: string; reparto?: Reparto; portada?: boolean };
 
 export const Historia: React.FC<HistoriaProps> = (p) => {
   const { fps, durationInFrames } = useVideoConfig();
@@ -40,7 +41,25 @@ export const Historia: React.FC<HistoriaProps> = (p) => {
           <Audio src={staticFile(`sfx/${x.nombre}.mp3`)} volume={Math.min(x.vol * (p.volumenEfectos ?? 1), 1)} />
         </Sequence>
       ))}
-      {p.musica ? <Audio src={staticFile(p.musica)} volume={p.volumenMusica} loop /> : null}
+      {p.portada ? null : (p.ambientes ?? []).map((a, i) => {
+        const desde = Math.round(a.desde * fps);
+        const d = Math.max(Math.round((a.hasta - a.desde) * fps), 1);
+        return (
+          <Sequence key={"amb" + i} from={desde} durationInFrames={d}>
+            <Audio src={staticFile(`sfx/${a.nombre}.mp3`)} loop volume={(f) => a.vol * interpolate(f, [0, 12, d - 12, d], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })} />
+          </Sequence>
+        );
+      })}
+      {p.musica && !p.portada ? (
+        // La música baja sola mientras habla la voz y sube en los huecos y al final
+        <Audio src={staticFile(p.musica)} loop volume={(f) => {
+          const t = f / fps;
+          const habla = p.palabras.some((w) => t >= w.s - 0.25 && t <= w.e + 0.35);
+          const fin = p.palabras.length ? p.palabras[p.palabras.length - 1].e : 0;
+          const base = p.volumenMusica * (t > fin + 0.3 ? 1.6 : habla ? 0.6 : 1);
+          return Math.min(base * interpolate(f, [0, 20, durationInFrames - 20, durationInFrames], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }), 1);
+        }} />
+      ) : null}
     </AbsoluteFill>
   );
 };

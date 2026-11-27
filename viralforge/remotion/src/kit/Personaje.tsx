@@ -35,6 +35,7 @@ export type PersonajeProps = {
   espejo?: boolean;
   luz?: "izq" | "der";
   semilla?: number;
+  brilla?: string | boolean; // la cara emite luz (p. ej. en un apagón): color del brillo
 };
 
 function osc(c: string, k = 0.22) {
@@ -67,6 +68,7 @@ export const Personaje: React.FC<PersonajeProps> = (props) => {
     bigote = false, barba = false, gafas = false, expresion = "normal", hablando = false, andar = false, mira = 0, brazo = "abajo", objeto,
     espejo = false, luz = "izq", semilla = 0,
   } = props;
+  const brillo = props.brilla ? (typeof props.brilla === "string" ? props.brilla : "#9CFFB0") : null;
   const atuendo = props.torso ?? props.atuendo ?? "camiseta";
   const f = useCurrentFrame() + semilla * 37;
   const pc = colorPelo ?? (edad === "anciano" ? "#D9D6CF" : ["#3B2416", "#5B3A22", "#1E1B1B", "#8A5A2B", "#C98B3A"][semilla % 5]);
@@ -259,7 +261,16 @@ export const Personaje: React.FC<PersonajeProps> = (props) => {
       </g>
       <g transform={`translate(0 ${cabezaY + respira}) rotate(${mira * 4 + (expresion === "confuso" ? Math.sin(f / 10) * 5 : 0)})`}>
         {peloDetras()}
-        <path d={cabeza} fill={`url(#${idg})`} stroke={TINTA} strokeWidth={L} strokeLinejoin="round" />
+        {brillo ? (
+          <g>
+            <defs>
+              <radialGradient id={idg + "b"}><stop offset="0" stopColor={brillo} stopOpacity={0.85} /><stop offset="0.45" stopColor={brillo} stopOpacity={0.35} /><stop offset="1" stopColor={brillo} stopOpacity={0} /></radialGradient>
+            </defs>
+            <circle cx={0} cy={0} r={RX * (2.6 + Math.sin(f / 6) * 0.15)} fill={`url(#${idg}b)`} />
+          </g>
+        ) : null}
+        <path d={cabeza} fill={brillo ? brillo : `url(#${idg})`} stroke={TINTA} strokeWidth={L} strokeLinejoin="round" />
+        {brillo ? <path d={cabeza} fill="#FFFFFF" opacity={0.45 + Math.sin(f / 6) * 0.1} transform="scale(0.72)" /> : null}
         <path d={`M ${ladoLuz * RX * 0.55} ${-RY * 0.72} Q ${ladoLuz * RX * 0.98} ${-RY * 0.2} ${ladoLuz * RX * 0.7} ${RY * 0.62}`} stroke={RIM} strokeWidth={7} fill="none" strokeLinecap="round" opacity={0.85} />
         {expresion !== "enfadado" ? <><ellipse cx={-RX * 0.58} cy={RY * 0.34} rx={18} ry={10} fill="#F7A6B5" opacity={0.55} /><ellipse cx={RX * 0.58} cy={RY * 0.34} rx={18} ry={10} fill="#F7A6B5" opacity={0.55} /></> : null}
         {edad === "anciano" ? <path d={`M ${-RX * 0.35} ${-RY * 0.5} q ${RX * 0.35} -8 ${RX * 0.7} 0`} stroke="#B8B6D9" strokeWidth={4} fill="none" strokeLinecap="round" /> : null}

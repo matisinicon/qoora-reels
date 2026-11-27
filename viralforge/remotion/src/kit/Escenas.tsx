@@ -207,7 +207,7 @@ export const EscenaKitView: React.FC<{ escena: EscenaKit; dur: number; reparto?:
   return (
     <svg viewBox="0 0 1080 1920" width={1080} height={1920} style={{ position: "absolute", inset: 0 }}>
       <Camara tipo={escena.camara} dur={dur}>
-        {C ? <C p={escena.p ?? {}} dur={dur} /> : <CapasView escena={{ fondo: escena.fondo ?? { tipo: "liso" }, vista: escena.vista, elementos: escena.elementos ?? [], luz: escena.luz, atmosfera: escena.atmosfera, primer_plano: escena.primer_plano }} dur={dur} reparto={reparto} />}
+        {C ? <C p={escena.p ?? {}} dur={dur} /> : <CapasView escena={{ fondo: escena.fondo ?? { tipo: "liso" }, vista: escena.vista, elementos: escena.elementos ?? [], luz: escena.luz, atmosfera: escena.atmosfera, primer_plano: escena.primer_plano, eventos: escena.eventos }} dur={dur} reparto={reparto} />}
       </Camara>
       <Acabado />
     </svg>
