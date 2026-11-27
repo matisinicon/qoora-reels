@@ -27,7 +27,7 @@ export const Portada: React.FC<PortadaProps> = ({ diseno_portada: d, reparto = {
   const sec = d.secundario ? reparto[d.secundario.ref] ?? {} : null;
   const Obj = d.objeto && BIBLIOTECA[d.objeto] ? BIBLIOTECA[d.objeto] : null;
   const esEmoji = d.objeto && !Obj;
-  const texto = (d.texto || titulo || "").toUpperCase().split(/\s+/).slice(0, 4).join(" ");
+  const texto = (d.texto || titulo || "").toUpperCase().split(/\s+/).slice(0, 5).join(" ");
   return (
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
       <svg viewBox="0 0 1080 1920" width={1080} height={1920} style={{ position: "absolute", inset: 0 }}>
