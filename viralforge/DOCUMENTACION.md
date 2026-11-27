@@ -542,3 +542,26 @@ cualquier paso: 3 fallos → fallido (y aviso).  Otros estados finales: hecho, c
 - Vídeos de prueba:
   - `06_outputs/videos/VF-0002_remotion.mp4`;
   - releases de GitHub VF-0003, VF-0004-v2, VF-0004-SFX-PRUEBA2 y VF-0003-v3.
+
+---
+
+## 19. Registro de cambios
+
+### 27/11/2026 (mañana)
+- **Incidencia nocturna:** se agotaron los créditos gratis de ElevenLabs (9.875 de 10.000). El Vídeo 1 del 27/11 falló en MOTION con «Authorization failed». El Vídeo 2 («¿Por qué este granjero pintó sus vacas de cebra?») se terminó bien. **Sin un plan de pago de ElevenLabs no se pueden generar más voces hasta el 26/12/2026.**
+- **FRAME:** la comprobación de escenas se relajó (mínimo de 5 o del 60 % de los segmentos, con un tope de 7). Las escenas vacías se descartan en lugar de rechazar todo el plan.
+- **SCOUT, METRICS y STORYLAB activados.** Trabajan con los **canales a los que está suscrita la cuenta de YouTube conectada**. Para cambiar los canales de referencia basta con suscribirse o desuscribirse en YouTube.
+  - **01:30 SCOUT (VF·01):**
+    1. Lee las suscripciones (`subscriptions?mine=true`) y los últimos 30 vídeos de cada canal, y se queda con los Shorts (≤ 180 s).
+    2. Calcula la mediana de vistas de cada canal y cuántas veces la supera cada vídeo (los *outliers*).
+    3. La IA elige hasta 10 referencias y explica por qué funcionan, qué patrón copiar y qué no copiar.
+    4. Actualiza los temas: tendencia, oportunidad, saturado.
+  - **01:45 METRICS (VF·02):** captura vistas, likes y comentarios de las referencias de los últimos 30 días y de los vídeos propios publicados, y los clasifica (outlier_positivo, crecimiento_acelerado, estable, débil o señal_insuficiente). Escribe un informe con recomendaciones para SCOUT, STORYLAB y SCRIPTOR. También corre a las 20:40.
+  - **02:05 STORYLAB (VF·03):** extrae de las referencias los mecanismos que funcionan (ganchos, estructuras, giros, cierres) y los guarda en `biblioteca_narrativa`.
+- **SCRIPTOR** recibe ahora, en `contexto_scriptor`:
+  - `referencias_top`: los 8 vídeos que mejor funcionan, con «por_que_funciona», «patron_a_copiar» y «no_copiar»;
+  - técnicas de la biblioteca;
+  - oportunidades;
+  - la recomendación de METRICS.
+  La orden es copiar el **formato** con **otra historia y otro dato real**.
+- **Primer análisis real (27/11):** 9 canales suscritos, entre ellos Ricks Clips, Weird Little Facts, Un Minuto de Porqués, Timeless moments, ZooBow Animations, Knox Clips y sabiasque.ia4. Salieron 10 referencias (por ejemplo «Why They Put Tires on a Train», con 8,5 M de visitas en 2 días), 6 temas y 23 recursos narrativos. Patrón dominante: «acción absurda → resultado práctico o sorprendente».
